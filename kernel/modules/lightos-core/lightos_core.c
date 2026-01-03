@@ -5,6 +5,8 @@
 #include <linux/fs.h>
 #include <linux/cdev.h>
 #include <linux/device.h>
+#include <linux/uaccess.h>
+#include <linux/string.h>
 #include "lightos_core.h"
 
 MODULE_LICENSE("GPL");
@@ -16,13 +18,49 @@ static dev_t lightos_dev;
 static struct cdev lightos_cdev;
 static struct class *lightos_class;
 
+static int lightos_open(struct inode *inode, struct file *file)
+{
+    pr_debug("LightOS device opened\n");
+    return 0;
+}
+
+static int lightos_release(struct inode *inode, struct file *file)
+{
+    pr_debug("LightOS device released\n");
+    return 0;
+}
+
 static long lightos_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
-    return 0;
+    struct lightos_device_state state;
+    int ret;
+
+    switch (cmd) {
+    case LIGHTOS_IOC_GET_DEVICE_STATE:
+        /* Populate with mock data for v0.1 */
+        memset(&state, 0, sizeof(state));
+        state.device_id = 0;
+        state.device_type = LIGHTOS_DEVICE_GPU;
+        state.utilization_percent = 75;
+        state.power_watts = 250;
+        state.memory_used_bytes = 8ULL * 1024 * 1024 * 1024; /* 8GB */
+        state.memory_total_bytes = 16ULL * 1024 * 1024 * 1024; /* 16GB */
+
+        ret = copy_to_user((void __user *)arg, &state, sizeof(state));
+        if (ret != 0)
+            return -EFAULT;
+
+        return 0;
+
+    default:
+        return -ENOTTY;
+    }
 }
 
 static struct file_operations lightos_fops = {
     .owner = THIS_MODULE,
+    .open = lightos_open,
+    .release = lightos_release,
     .unlocked_ioctl = lightos_ioctl,
 };
 
