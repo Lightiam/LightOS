@@ -1,0 +1,16 @@
+﻿apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lightos-config
+  namespace: lightos
+data:
+  agent.conf: |
+    {
+      "fabric_os": {
+        "endpoint": "fabric-os.default.svc.cluster.local",
+        "port": 50051
+      },
+      "telemetry": {
+        "interval_ms": 1000
+      }
+    }

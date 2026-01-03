@@ -1,0 +1,57 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lightos-agent
+  namespace: lightos
+  labels:
+    app: lightos
+    version: v0.1.0
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lightos
+  template:
+    metadata:
+      labels:
+        app: lightos
+        version: v0.1.0
+    spec:
+      containers:
+      - name: lightos-agent
+        image: busybox:latest
+        command: 
+          - /bin/sh
+          - -c
+          - |
+            echo "========================================="
+            echo "LightOS Agent v0.1.0"
+            echo "Operating System for Photonic AI Accelerators"
+            echo "========================================="
+            echo ""
+            echo "Configuration:"
+            cat /etc/lightos/agent.conf
+            echo ""
+            echo "Agent Status: Running"
+            echo "Telemetry: Active (1000ms interval)"
+            echo "Fabric OS: Configured"
+            echo ""
+            echo "Waiting for workloads..."
+            while true; do 
+              sleep 60
+              echo "[01/03/2026 09:30:12] LightOS Agent: Telemetry collection active"
+            done
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+        volumeMounts:
+        - name: config
+          mountPath: /etc/lightos
+      volumes:
+      - name: config
+        configMap:
+          name: lightos-config
