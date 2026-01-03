@@ -1,0 +1,16 @@
+# Build artifacts
+*.o
+*.ko
+*.mod
+*.mod.c
+*.symvers
+*.order
+build/
+*.so
+*.so.*
+*.pyc
+__pycache__/
+.terraform/
+*.tfstate
+.vscode/
+*.swp
