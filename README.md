@@ -1,12 +1,8 @@
-# LightOS - Platform-Agnostic Operating System for AI Accelerators
+# LightOS - Platform-Agnostic OS for AI Accelerators
 
-**Write once. Run on NVIDIA, AMD, ARM, Intel, Apple, and future photonic NPUs.**
+**Write once. Run on NVIDIA, AMD, ARM, Intel, Apple, and photonic NPUs.**
 
-## Vision
-
-LightOS is a platform-agnostic OS for AI accelerators, inspired by OpenCL.
-
-### Supported Platforms
+## Supported Platforms
 - ✅ NVIDIA GPUs (CUDA)
 - ✅ AMD GPUs (ROCm)
 - ✅ ARM GPUs (OpenCL)
@@ -15,19 +11,9 @@ LightOS is a platform-agnostic OS for AI accelerators, inspired by OpenCL.
 - ✅ Future Photonic NPUs
 
 ## Benefits
-- **Platform-agnostic**: One API for all hardware
-- **Cost savings**: 27-30% with mixed clusters
-- **No vendor lock-in**: Switch anytime
-- **Future-proof**: Ready for photonic NPUs
+- Platform-agnostic API
+- 27-30% cost savings
+- No vendor lock-in
+- Future-proof
 
-## Quick Start
-```c
-lightos_context_t ctx = lightos_create_context(LIGHTOS_DEVICE_ANY);
-// Works on NVIDIA, AMD, ARM, Intel, Apple!
-```
-
-## Links
-- Website: https://lightrail.ink
-- GitHub: https://github.com/Lightiam/LightOS
-
-**LightOS: Write once. Run on any AI accelerator.**
+**LightOS: Write once. Run anywhere.**
