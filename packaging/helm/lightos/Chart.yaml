@@ -1,0 +1,6 @@
+﻿apiVersion: v2
+name: lightos
+description: LightOS - Operating System for Photonic AI Accelerators
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

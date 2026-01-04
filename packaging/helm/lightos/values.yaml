@@ -1,0 +1,19 @@
+﻿fabricOS:
+  endpoint: "fabric-os.default.svc.cluster.local"
+  port: 50051
+
+agent:
+  image:
+    repository: lightos-agent
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+  
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+
+replicaCount: 1

@@ -1,0 +1,17 @@
+﻿apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lightos-config
+  labels:
+    app: lightos
+data:
+  agent.conf: |
+    {
+      "fabric_os": {
+        "endpoint": "{{ .Values.fabricOS.endpoint }}",
+        "port": {{ .Values.fabricOS.port }}
+      },
+      "telemetry": {
+        "interval_ms": 1000
+      }
+    }

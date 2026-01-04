@@ -1,0 +1,29 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lightos-agent
+  labels:
+    app: lightos
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: lightos
+  template:
+    metadata:
+      labels:
+        app: lightos
+    spec:
+      containers:
+      - name: lightos-agent
+        image: busybox:latest
+        command: ["/bin/sh", "-c", "echo 'LightOS Agent v0.1.0 running'; while true; do sleep 3600; done"]
+        resources:
+          {{- toYaml .Values.agent.resources | nindent 10 }}
+        volumeMounts:
+        - name: config
+          mountPath: /etc/lightos
+      volumes:
+      - name: config
+        configMap:
+          name: lightos-config
