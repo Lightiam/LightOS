@@ -1,5 +1,5 @@
 ```markdown
-# LightOS Neural Compute Engine v0.2.0
+# LightOS Neural Compute Engine v0.2.1
 
 ## 🚀 Executive Summary
 
@@ -69,6 +69,92 @@ LightOS has been transformed from a basic photonic AI accelerator OS into a **pl
 │    NVIDIA    │  │     AMD     │  │    Intel   │  │  Photonic │
 │ CUDA Driver  │  │ ROCm Driver │  │   oneAPI   │  │   (NEW)   │
 └──────────────┘  └─────────────┘  └────────────┘  └───────────┘
+```
+
+---
+
+## 🌍 Deployment Options
+
+LightOS v0.2.1 introduces **multiple deployment methodologies** to suit different use cases:
+
+### 1. **Edge Computing (NEW)** 🔥
+
+Deploy LightOS as a **complete bootable OS** on edge devices:
+
+```bash
+# Build bootable ISO
+sudo ./build-system/lightos-builder.sh amd64 iso
+
+# Write to USB drive
+sudo dd if=output/lightos-0.2.1-amd64.iso of=/dev/sdX bs=4M
+
+# Boot and install to any machine
+```
+
+**Supported Hardware**:
+- ✅ **x86-64**: Intel NUC, Dell OptiPlex, HP ProDesk, generic PCs
+- ✅ **ARM64**: Raspberry Pi 4/5, NVIDIA Jetson (Nano/Xavier/Orin)
+- ✅ **GPUs**: NVIDIA (CUDA), AMD (ROCm), Intel integrated
+- ✅ **Photonic NPUs**: Auto-detected via PCIe
+
+**Features**:
+- 🚀 Bare-metal performance (no VM overhead)
+- 🔍 Automatic hardware detection and optimization
+- ⚡ Power-efficient edge inference (15-65W TDP profiles)
+- 🌐 Federated learning ready
+- 📊 Infrastructure Autopilot (DRL-based HVAC optimization)
+
+**Quick Start**:
+```bash
+# 1. Build ISO
+cd /path/to/LightOS
+sudo ./build-system/lightos-builder.sh amd64 iso
+
+# 2. Boot from USB and install
+# 3. Access LLM Training Ground: http://localhost:8080
+```
+
+**Documentation**: See [`deployment/edge/EDGE_DEPLOYMENT_GUIDE.md`](deployment/edge/EDGE_DEPLOYMENT_GUIDE.md)
+
+### 2. **Cloud Deployment (AWS/GCP/Azure)**
+
+Deploy to cloud infrastructure with Infrastructure-as-Code:
+
+```bash
+# AWS deployment via Terraform
+cd deployment/aws/terraform
+terraform init
+terraform apply
+```
+
+**Documentation**: See [`deployment/aws/DEPLOYMENT_GUIDE.md`](deployment/aws/DEPLOYMENT_GUIDE.md)
+
+### 3. **Container Deployment (Docker/Kubernetes)**
+
+Lightweight containerized deployment:
+
+```bash
+# Build edge container
+sudo ./build-system/lightos-builder.sh amd64 container
+
+# Run with Docker
+docker run -d --privileged -p 8080:8080 lightos:edge
+
+# Deploy to Kubernetes
+kubectl apply -f deployment/k8s/lightos-daemonset.yaml
+```
+
+### 4. **Development Mode (WSL/VM)**
+
+For development and testing:
+
+```bash
+# Build kernel modules
+make modules
+sudo insmod kernel/modules/lightos-core/lightos_core.ko
+
+# Run userspace components
+./fabric-os/lightrail-scheduler/scheduler &
 ```
 
 ---
