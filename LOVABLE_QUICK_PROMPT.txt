@@ -1,0 +1,56 @@
+Create a web app called "LLM Dev Tools" with a dark theme (indigo/teal colors).
+
+MAIN MENU with 3 sections:
+
+1. UNSLOTH FAST FINE-TUNING (⚡ 2-5x faster)
+- Model selector: Llama 3.1 8B, Mistral 7B, Qwen 2.5 7B, GLM-4 9B, Gemma 7B
+- Dataset upload (drag-drop JSON/JSONL with validation)
+- Training config panel:
+  * Max steps slider (10-1000, default 60)
+  * Learning rate (default 2e-4)
+  * Batch size dropdown (1,2,4,8)
+  * LoRA rank slider (8-64, default 16)
+  * Toggles: 4-bit quantization, Flash Attention
+- Real-time training progress with:
+  * Progress bar
+  * Loss curve chart (Recharts)
+  * GPU utilization
+  * Training logs (terminal style)
+  * Pause/Resume/Stop buttons
+- Model export (download trained model)
+
+2. GLM-4 CODING AGENT (🤖 71.8% HumanEval)
+Tabs: Generate | Explain | Fix Bugs | Add Docs | Refactor
+- Large text area for input
+- Language selector (40+ languages)
+- Monaco code editor for output with syntax highlighting
+- Copy/Download buttons
+- Settings: temperature, max tokens, 4-bit toggle
+
+3. QWEN2.5-CODER (🏆 74.5% HumanEval - Beats GPT-4)
+- Model size selector: 0.5B, 1.5B, 7B⭐, 14B, 32B
+- Tabs: Generate Function | Complete Code | Generate Tests | Debug | Refactor | Interactive
+- Split view for code completion
+- Test framework selector (pytest, unittest, jest)
+- Real-time suggestions
+
+DASHBOARD PAGE:
+- Hero: "Train Faster. Code Smarter. Build Better."
+- Stats cards: "2-5x Faster", "70% Less Memory", "74.5% HumanEval", "6+ Platforms"
+- Quick action cards for each tool
+- Recent activity
+
+DOCUMENTATION PAGE:
+- Getting Started guide
+- User guides (fine-tuning, coding agents)
+- API Reference with code examples
+- FAQ and troubleshooting
+
+TECH STACK:
+- React + TypeScript + Tailwind + shadcn/ui
+- Monaco Editor for code
+- Recharts for charts
+- React Query for API
+- Dark theme with smooth animations
+
+Make it production-ready with proper error handling, loading states, and responsive design (mobile-friendly).
