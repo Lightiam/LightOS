@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  lightos:
+    build: .
+    image: lightos:0.2.1
+    container_name: lightos-nce
+
+    # GPU support
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+    # Ports
+    ports:
+      - "8080:8080"  # Training Ground UI
+      - "8888:8888"  # Jupyter (optional)
+
+    # Volumes
+    volumes:
+      - ./models:/lightos/models        # Persistent models
+      - ./datasets:/lightos/datasets    # Persistent datasets
+      - ./outputs:/lightos/outputs      # Training outputs
+      - ./logs:/lightos/logs            # Logs
+
+    # Environment
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - CUDA_VISIBLE_DEVICES=0
+
+    # Keep container running
+    stdin_open: true
+    tty: true
+
+    # Restart policy
+    restart: unless-stopped

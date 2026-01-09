@@ -1,0 +1,85 @@
+# markdown-builder Configuration
+
+# Site information
+site_name: LightOS Documentation
+site_description: Platform-agnostic OS for AI accelerators with cutting-edge LLM training
+site_author: LightOS Team
+site_url: https://docs.lightrail.ink
+
+# Repository
+repo_name: Lightiam/LightOS
+repo_url: https://github.com/Lightiam/LightOS
+
+# Theme configuration
+theme:
+  name: material
+  palette:
+    primary: indigo
+    accent: teal
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+# Navigation structure
+nav:
+  - Home: README.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - Quick Start: getting-started/quickstart.md
+  - Guides:
+      - Fine-Tuning: guides/fine-tuning.md
+      - Coding Agents: guides/coding-agents.md
+      - Edge Deployment: guides/edge-deployment.md
+      - VirtualBox: guides/virtualbox.md
+  - API Reference:
+      - Overview: api/README.md
+      - Unsloth: api/unsloth.md
+      - GLM-4: api/glm4.md
+      - Qwen2.5-Coder: api/qwen-coder.md
+      - CLI: api/cli.md
+  - Examples:
+      - Overview: examples/README.md
+      - Basic: examples/basic.md
+      - Advanced: examples/advanced.md
+      - Use Cases: examples/use-cases.md
+
+# Markdown extensions
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - pymdownx.emoji
+
+# Extra CSS/JS
+extra_css:
+  - assets/custom.css
+
+extra_javascript:
+  - assets/custom.js
+
+# Google Analytics (optional)
+# google_analytics:
+#   - UA-XXXXXXXX-X
+#   - auto
+
+# Social links
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Lightiam/LightOS
+    - icon: fontawesome/brands/discord
+      link: https://lightos.dev/community
+
+# Copyright
+copyright: Copyright &copy; 2026 LightOS Team

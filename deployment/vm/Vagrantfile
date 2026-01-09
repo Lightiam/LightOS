@@ -1,0 +1,157 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# LightOS Neural Compute Engine
+# Vagrant configuration for quick development setup
+
+Vagrant.configure("2") do |config|
+  # Base box (will be replaced with LightOS box)
+  config.vm.box = "ubuntu/jammy64"
+  config.vm.box_version = "~> 20230215.0.0"
+
+  # VM name
+  config.vm.hostname = "lightos-dev"
+
+  # Network configuration
+  # Forward LLM Training Ground UI
+  config.vm.network "forwarded_port", guest: 8080, host: 8080, host_ip: "127.0.0.1"
+  # Forward SSH (automatic)
+  # config.vm.network "forwarded_port", guest: 22, host: 2222
+
+  # Private network for cluster testing
+  # config.vm.network "private_network", ip: "192.168.50.10"
+
+  # Synced folder
+  config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+
+  # Provider-specific configuration
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "LightOS-NCE-Dev"
+    vb.memory = "4096"
+    vb.cpus = 4
+
+    # Enable nested virtualization (if supported)
+    vb.customize ["modifyvm", :id, "--nested-hw-virt", "on"]
+
+    # Better graphics
+    vb.customize ["modifyvm", :id, "--vram", "128"]
+    vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
+
+    # Enable USB (for hardware passthrough testing)
+    vb.customize ["modifyvm", :id, "--usb", "on"]
+  end
+
+  config.vm.provider "libvirt" do |lv|
+    lv.memory = "4096"
+    lv.cpus = 4
+    lv.driver = "kvm"
+    lv.nested = true
+    lv.cpu_mode = "host-passthrough"
+  end
+
+  config.vm.provider "vmware_desktop" do |v|
+    v.vmx["memsize"] = "4096"
+    v.vmx["numvcpus"] = "4"
+    v.vmx["vhv.enable"] = "TRUE"  # Nested virtualization
+  end
+
+  # Provision LightOS if using base Ubuntu box
+  config.vm.provision "shell", inline: <<-SHELL
+    set -e
+
+    echo "═══════════════════════════════════════════"
+    echo "   LightOS Neural Compute Engine Setup"
+    echo "═══════════════════════════════════════════"
+    echo ""
+
+    # Update system
+    apt-get update
+    apt-get install -y build-essential linux-headers-$(uname -r) dkms \
+        python3 python3-pip git curl wget
+
+    # Check if LightOS is already installed
+    if [ -d "/opt/lightos" ]; then
+        echo "✓ LightOS already installed"
+    else
+        echo "Installing LightOS from /vagrant..."
+
+        # Copy LightOS components
+        mkdir -p /opt/lightos /etc/lightos /usr/src/lightos-0.2.1
+        cp -r /vagrant/kernel/modules/lightos-core /usr/src/lightos-0.2.1/
+        cp -r /vagrant/kernel/drivers/photonic /usr/src/lightos-0.2.1/
+        cp -r /vagrant/fabric-os/* /opt/lightos/
+        cp -r /vagrant/llm-training-ground /opt/lightos/
+        cp -r /vagrant/build-system/edge-profiles /opt/lightos/
+        cp -r /vagrant/build-system/hardware-detection /opt/lightos/
+
+        # Create VM profile
+        cat > /etc/lightos/edge.conf << 'EOF'
+[hardware]
+platform = virtual-machine
+virtualized = true
+
+[spiking]
+enabled = true
+target_sparsity_percent = 69
+
+[moe]
+enabled = true
+num_experts = 8
+top_k = 2
+EOF
+
+        # Build kernel modules
+        echo "Building kernel modules..."
+        cd /usr/src/lightos-0.2.1/lightos-core
+        make || echo "Note: Kernel module build may require manual intervention"
+
+        # Install Python dependencies
+        echo "Installing Python dependencies..."
+        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+        pip3 install transformers datasets accelerate
+
+        echo "✓ LightOS installed"
+    fi
+
+    # Run hardware detection
+    echo "Running hardware detection..."
+    bash /opt/lightos/hardware-detection/detect-hardware.sh || true
+
+    echo ""
+    echo "═══════════════════════════════════════════"
+    echo "   LightOS Setup Complete!"
+    echo "═══════════════════════════════════════════"
+    echo ""
+    echo "Access LLM Training Ground:"
+    echo "  http://localhost:8080"
+    echo ""
+    echo "SSH into VM:"
+    echo "  vagrant ssh"
+    echo ""
+    echo "Useful commands:"
+    echo "  • vagrant halt     - Stop VM"
+    echo "  • vagrant destroy  - Delete VM"
+    echo "  • vagrant reload   - Restart VM"
+    echo ""
+  SHELL
+
+  # Message after VM is up
+  config.vm.post_up_message = <<-MESSAGE
+    ╦  ┬┌─┐┬ ┬┌┬┐╔═╗╔═╗
+    ║  ││ ┬├─┤ │ ║ ║╚═╗
+    ╩═╝┴└─┘┴ ┴ ┴ ╚═╝╚═╝
+
+    LightOS Neural Compute Engine is ready!
+
+    Access services:
+      • LLM Training Ground: http://localhost:8080
+      • SSH: vagrant ssh
+
+    Inside VM:
+      • Check status: systemctl status lightos-*
+      • View logs: journalctl -u lightos-autopilot -f
+      • Hardware report: cat /etc/lightos/hardware-report.json
+
+    Happy coding! 🚀
+  MESSAGE
+end
