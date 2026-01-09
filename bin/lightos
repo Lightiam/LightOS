@@ -1,0 +1,8 @@
+#!/bin/bash
+# LightOS Main Launcher
+# Interactive UI for LLM Training Ground
+
+source /opt/lightos/venv/bin/activate
+cd /opt/lightos/llm-training-ground/ui
+
+python3 enhanced_launcher.py "$@"
