@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LightOS Documentation - Neural Compute Engine</title>
+    <meta name="description" content="LightOS: Platform-agnostic OS for AI accelerators with cutting-edge LLM training and coding capabilities.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --secondary: #10B981;
+            --background: #0F172A;
+            --surface: #1E293B;
+            --text: #F1F5F9;
+            --text-muted: #94A3B8;
+            --border: #334155;
+            --code-bg: #1E293B;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--background);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            margin-left: 2rem;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            color: var(--text-muted);
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .section {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 2rem;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+        }
+
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .card a {
+            color: var(--secondary);
+            text-decoration: none;
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .code-block code {
+            color: var(--text);
+            font-family: 'Courier New', monospace;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        .feature-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+        }
+
+        footer {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 2rem 0;
+            margin-top: 4rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            nav a {
+                margin-left: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="/" class="logo">LightOS Docs</a>
+            <nav>
+                <a href="#getting-started">Getting Started</a>
+                <a href="#api">API Reference</a>
+                <a href="#examples">Examples</a>
+                <a href="https://github.com/Lightiam/LightOS">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>LightOS Documentation</h1>
+            <p>Platform-agnostic OS for AI accelerators with cutting-edge LLM training</p>
+            <div class="cta-buttons">
+                <a href="#getting-started" class="btn btn-primary">Get Started</a>
+                <a href="https://github.com/Lightiam/LightOS" class="btn btn-secondary">View on GitHub</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="stats" class="section">
+        <div class="container">
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value">2-5x</div>
+                    <div class="stat-label">Faster Training</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">70%</div>
+                    <div class="stat-label">Less Memory</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">74.5%</div>
+                    <div class="stat-label">HumanEval Score</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">6+</div>
+                    <div class="stat-label">Platforms Supported</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="getting-started" class="section">
+        <div class="container">
+            <h2 class="section-title">Quick Start</h2>
+
+            <div class="code-block">
+                <code># Clone repository
+git clone https://github.com/Lightiam/LightOS.git
+cd LightOS
+
+# Install (one command!)
+sudo ./simple-deploy.sh
+
+# Start using
+lightos</code>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>🚀 Installation</h3>
+                    <p>Get LightOS running on your system in minutes</p>
+                    <ul class="feature-list">
+                        <li>Ubuntu / WSL2 / Linux</li>
+                        <li>Docker deployment</li>
+                        <li>VirtualBox VM</li>
+                    </ul>
+                    <a href="guides/installation.html">Installation Guide →</a>
+                </div>
+
+                <div class="card">
+                    <h3>⚡ Fine-Tuning</h3>
+                    <p>Train LLMs 2-5x faster with Unsloth</p>
+                    <ul class="feature-list">
+                        <li>Llama, Mistral, Qwen</li>
+                        <li>70% less memory</li>
+                        <li>Custom datasets</li>
+                    </ul>
+                    <a href="guides/fine-tuning.html">Fine-Tuning Guide →</a>
+                </div>
+
+                <div class="card">
+                    <h3>💻 Coding Agents</h3>
+                    <p>AI assistants that beat GPT-4</p>
+                    <ul class="feature-list">
+                        <li>GLM-4 (71.8% HumanEval)</li>
+                        <li>Qwen2.5-Coder (74.5%)</li>
+                        <li>40+ languages</li>
+                    </ul>
+                    <a href="guides/coding-agents.html">Coding Guide →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="api" class="section" style="background: var(--surface);">
+        <div class="container">
+            <h2 class="section-title">API Reference</h2>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>Unsloth Integration</h3>
+                    <p>Fast fine-tuning API</p>
+                    <div class="code-block">
+                        <code>from unsloth_integration import quick_finetune
+
+quick_finetune(
+    model_name="llama-3.1-8b",
+    dataset_name="alpaca",
+    max_steps=100
+)</code>
+                    </div>
+                    <a href="api/unsloth.html">Full API Docs →</a>
+                </div>
+
+                <div class="card">
+                    <h3>Coding Agents</h3>
+                    <p>Code generation and analysis</p>
+                    <div class="code-block">
+                        <code>from coding_agents.qwen3_coder import Qwen3CoderAgent
+
+agent = Qwen3CoderAgent(model_size="7b")
+code = agent.generate_function("fibonacci")</code>
+                    </div>
+                    <a href="api/coding-agents.html">Full API Docs →</a>
+                </div>
+
+                <div class="card">
+                    <h3>CLI Commands</h3>
+                    <p>System-wide launcher scripts</p>
+                    <div class="code-block">
+                        <code># Main launcher
+lightos
+
+# Coding assistant
+lightos-code qwen generate "hello world"
+
+# Fine-tuning
+lightos-train train llama-3.1-8b alpaca</code>
+                    </div>
+                    <a href="api/cli.html">CLI Reference →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="examples" class="section">
+        <div class="container">
+            <h2 class="section-title">Examples</h2>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>Basic Examples</h3>
+                    <ul class="feature-list">
+                        <li>Quick Fine-Tune</li>
+                        <li>Code Generation</li>
+                        <li>Code Explanation</li>
+                    </ul>
+                    <a href="examples/basic.html">View Examples →</a>
+                </div>
+
+                <div class="card">
+                    <h3>Advanced Examples</h3>
+                    <ul class="feature-list">
+                        <li>Custom Dataset Training</li>
+                        <li>Multi-GPU Training</li>
+                        <li>Hyperparameter Tuning</li>
+                    </ul>
+                    <a href="examples/advanced.html">View Examples →</a>
+                </div>
+
+                <div class="card">
+                    <h3>Use Cases</h3>
+                    <ul class="feature-list">
+                        <li>Customer Support Bot</li>
+                        <li>Code Review Assistant</li>
+                        <li>Domain-Specific Models</li>
+                    </ul>
+                    <a href="examples/use-cases.html">View Examples →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="container" style="text-align: center;">
+            <h2 style="margin-bottom: 1rem;">Ready to Get Started?</h2>
+            <p style="margin-bottom: 2rem; font-size: 1.1rem;">Install LightOS in 3 minutes and start training faster</p>
+            <a href="https://github.com/Lightiam/LightOS" class="btn btn-primary">Get LightOS</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 LightOS. MIT Licensed.</p>
+            <p style="margin-top: 0.5rem;">
+                <a href="https://github.com/Lightiam/LightOS" style="color: var(--primary);">GitHub</a> ·
+                <a href="https://github.com/Lightiam/LightOS/issues" style="color: var(--primary);">Issues</a> ·
+                <a href="https://lightos.dev/community" style="color: var(--primary);">Community</a>
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
