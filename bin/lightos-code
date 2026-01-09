@@ -1,0 +1,48 @@
+#!/bin/bash
+# LightOS Coding Agent Launcher
+# Use GLM-4 or Qwen2.5-Coder for AI-assisted coding
+
+source /opt/lightos/venv/bin/activate
+cd /opt/lightos/llm-training-ground/coding_agents
+
+if [ "$1" = "glm4" ]; then
+    shift
+    python3 glm4_agent.py "$@"
+elif [ "$1" = "qwen" ]; then
+    shift
+    python3 qwen3_coder.py "$@"
+else
+    cat << 'EOF'
+🤖 LightOS Coding Agent
+
+Usage: lightos-code [glm4|qwen] <command> <args>
+
+AGENTS:
+  glm4   - GLM-4 9B coding assistant (71.8% HumanEval)
+  qwen   - Qwen2.5-Coder (74.5% HumanEval, beats GPT-4)
+
+COMMANDS:
+  generate <description>  - Generate code from description
+  complete <file>         - Complete code in file
+  explain <file>          - Explain code in file
+  fix <file>             - Find and fix bugs
+  refactor <file>        - Refactor code
+  test <file>            - Generate unit tests
+  interactive            - Start interactive session
+
+EXAMPLES:
+  lightos-code qwen generate "fibonacci function in python"
+  lightos-code glm4 explain my_script.py
+  lightos-code qwen complete app.py
+  lightos-code glm4 fix buggy_code.py
+  lightos-code qwen test calculator.py
+  lightos-code qwen interactive
+
+OPTIONS:
+  --model-size SIZE   - Model size (qwen: 0.5b,1.5b,7b,14b,32b)
+  --language LANG     - Programming language
+  --4bit              - Use 4-bit quantization (less memory)
+  --help              - Show detailed help
+
+EOF
+fi
