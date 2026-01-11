@@ -1,0 +1,82 @@
+# LightOS Development Environment Configuration
+
+# Build Server Settings
+build_server:
+  host: "0.0.0.0"
+  port: 3000
+  hot_reload: true
+  auto_restart: true
+  watch_extensions: [".js", ".jsx", ".ts", ".tsx", ".py", ".css", ".html"]
+  ignore_paths: ["node_modules", "dist", "build", ".git", "__pycache__"]
+
+# Preview Server Settings
+preview_server:
+  host: "0.0.0.0"
+  port: 5173  # Vite default
+  https: false
+  cors_enabled: true
+
+# Backend API Server
+api_server:
+  host: "0.0.0.0"
+  port: 8000
+  auto_reload: true
+  workers: 1
+
+# Database Settings
+database:
+  type: "postgresql"  # postgresql, sqlite, supabase
+  host: "localhost"
+  port: 5432
+  auto_migrate: true
+  seed_data: true
+
+# GLM-4 App Builder Settings
+glm4_builder:
+  model_size: "9b"  # 9b recommended for coding
+  max_iterations: 10
+  planning_required: true
+  auto_fix_errors: true
+  max_auto_fixes: 3
+
+  # Default stack
+  default_stack:
+    frontend: "react-vite-tailwind"
+    backend: "fastapi"  # or "express"
+    database: "postgresql"
+    auth: "supabase"
+
+  # Code quality
+  linting: true
+  formatting: true
+  type_checking: true
+  testing: true
+
+# Project Templates
+templates:
+  - name: "fullstack-react-fastapi"
+    description: "React + Vite + Tailwind frontend with FastAPI backend"
+    stack: ["react", "vite", "tailwind", "fastapi", "postgresql"]
+
+  - name: "nextjs-supabase"
+    description: "Next.js with Supabase backend"
+    stack: ["nextjs", "tailwind", "supabase"]
+
+  - name: "vue-express"
+    description: "Vue 3 + Express.js + PostgreSQL"
+    stack: ["vue", "vite", "tailwind", "express", "postgresql"]
+
+# Development Tools
+tools:
+  code_formatter: "prettier"
+  linter: "eslint"
+  type_checker: "typescript"
+  test_runner: "vitest"
+  bundler: "vite"
+
+# Logging
+logging:
+  level: "info"  # debug, info, warning, error
+  file: "dev-environment.log"
+  console: true
+  structured: true

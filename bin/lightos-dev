@@ -1,0 +1,20 @@
+#!/bin/bash
+# LightOS Development Environment Launcher
+# Turn ideas into apps with AI-powered build + preview
+
+set -e
+
+# Activate virtual environment
+if [ -f "/opt/lightos/venv/bin/activate" ]; then
+    source /opt/lightos/venv/bin/activate
+else
+    echo "Error: LightOS virtual environment not found"
+    echo "Please run: /opt/lightos/simple-deploy.sh"
+    exit 1
+fi
+
+# Change to dev environment directory
+cd /opt/lightos/llm-training-ground/dev-environment
+
+# Run the CLI
+python3 lightos_dev.py "$@"
