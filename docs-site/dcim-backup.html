@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LightOS DCIM - Data Center Infrastructure Management</title>
+    <meta name="description" content="Real-time DCIM dashboard with AI-driven telemetry and peak shaving for GPU cloud infrastructure">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --secondary: #10B981;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --background: #0F172A;
+            --surface: #1E293B;
+            --surface-light: #293548;
+            --text: #F1F5F9;
+            --text-muted: #94A3B8;
+            --border: #334155;
+            --code-bg: #1E293B;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--background);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            margin-left: 2rem;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .hero {
+            text-align: center;
+            padding: 3rem 0 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        .section {
+            padding: 2rem 0;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+        @media (max-width: 1024px) {
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .grid-3 { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 640px) {
+            .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-title {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .card-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .card-metric {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+        }
+
+        .metric-unit {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--surface-light);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-optimal { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .status-warning { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .status-critical { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+
+        .quad-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .quad-card {
+            background: var(--surface-light);
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            border-left: 3px solid var(--primary);
+        }
+
+        .quad-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .quad-metric {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .quad-description {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--surface-light);
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 2rem;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -2.35rem;
+            top: 0.25rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 2px solid var(--background);
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .layer-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .layer-card {
+            background: var(--surface-light);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .layer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .layer-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .layer-level {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: var(--surface);
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+        }
+
+        .layer-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .layer-components {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .component-tag {
+            background: var(--surface);
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+        }
+
+        .chart-placeholder {
+            background: var(--surface-light);
+            border-radius: 0.5rem;
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        code {
+            background: var(--code-bg);
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .refresh-indicator {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .api-endpoint {
+            background: var(--surface-light);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">LightOS DCIM</a>
+                <nav>
+                    <a href="#overview">Overview</a>
+                    <a href="#kpi">KPIs</a>
+                    <a href="#telemetry">Telemetry</a>
+                    <a href="#isa95">ISA-95</a>
+                    <a href="#peak-shaving">Peak Shaving</a>
+                    <a href="index.html">← Back to Docs</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="hero">
+        <div class="container">
+            <h1><span class="status-indicator"></span>Data Center Infrastructure Management</h1>
+            <p>Real-time telemetry and AI-driven optimization for GPU cloud infrastructure</p>
+        </div>
+    </div>
+
+    <!-- KPI Dashboard -->
+    <section id="kpi" class="section">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Key Performance Indicators</h2>
+                    <p class="section-subtitle">Real-time metrics refreshed every second</p>
+                </div>
+                <span class="refresh-indicator" id="lastUpdate">Loading...</span>
+            </div>
+
+            <div class="grid grid-4">
+                <div class="card">
+                    <div class="card-title">Clock Stability</div>
+                    <div class="card-metric">
+                        <div class="card-value" id="clockStability">--</div>
+                        <span class="metric-unit">%</span>
+                    </div>
+                    <div class="card-label">SM Clock Consistency</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="clockStabilityBar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Throttle Events</div>
+                    <div class="card-metric">
+                        <div class="card-value" id="throttleEvents">--</div>
+                        <span class="metric-unit">count</span>
+                    </div>
+                    <div class="card-label">Zero Throttling Target</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="throttleBar" style="width: 100%; background: var(--success);"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Thermal Headroom</div>
+                    <div class="card-metric">
+                        <div class="card-value" id="thermalHeadroom">--</div>
+                        <span class="metric-unit">°C</span>
+                    </div>
+                    <div class="card-label">Temperature Margin</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="thermalBar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Power Utilization</div>
+                    <div class="card-metric">
+                        <div class="card-value" id="powerUtil">--</div>
+                        <span class="metric-unit">%</span>
+                    </div>
+                    <div class="card-label">% of TDP</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="powerBar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">AI-OEE</div>
+                    <div class="card-metric">
+                        <div class="card-value" id="aiOEE">--</div>
+                        <span class="metric-unit">%</span>
+                    </div>
+                    <div class="card-label">Overall Equipment Effectiveness</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="oeeBar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">MFU</div>
+                    <div class="card-metric">
+                        <div class="card-value" id="mfu">--</div>
+                        <span class="metric-unit">%</span>
+                    </div>
+                    <div class="card-label">Model FLOPS Utilization</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="mfuBar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Peak Shaving Savings</div>
+                    <div class="card-metric">
+                        <div class="card-value" id="savings">--</div>
+                        <span class="metric-unit">USD</span>
+                    </div>
+                    <div class="card-label">Monthly Estimate</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">PUE</div>
+                    <div class="card-metric">
+                        <div class="card-value" id="pue">--</div>
+                    </div>
+                    <div class="card-label">Power Usage Effectiveness</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI GPU Service Cost Proof -->
+    <section id="overview" class="section" style="background: var(--surface);">
+        <div class="container">
+            <h2 class="section-title">AI GPU Service Cost Proof</h2>
+            <p class="section-subtitle">Transparent metrics proving performance guarantees</p>
+
+            <div class="quad-grid" style="margin-top: 2rem;">
+                <div class="quad-card">
+                    <div class="quad-title">1. Clock Speed Consistency</div>
+                    <div class="quad-metric" id="quadClock">99.8%</div>
+                    <div class="quad-description">
+                        <strong>Metric:</strong> Stable SM Clock<br>
+                        <strong>Purpose:</strong> Minimal clock jitter ensures predictable training times
+                    </div>
+                </div>
+
+                <div class="quad-card">
+                    <div class="quad-title">2. Zero Throttling Events</div>
+                    <div class="quad-metric" id="quadThrottle">0</div>
+                    <div class="quad-description">
+                        <strong>Metric:</strong> SW Power Cap + Thermal Slowdown<br>
+                        <strong>Goal:</strong> Zero throttling events across all GPUs
+                    </div>
+                </div>
+
+                <div class="quad-card">
+                    <div class="quad-title">3. Thermal Headroom</div>
+                    <div class="quad-metric" id="quadThermal">25°C</div>
+                    <div class="quad-description">
+                        <strong>Metric:</strong> Temperature margin vs. T_limit<br>
+                        <strong>Purpose:</strong> Safe cooling margin for long training runs
+                    </div>
+                </div>
+
+                <div class="quad-card">
+                    <div class="quad-title">4. Power Draw vs. TDP</div>
+                    <div class="quad-metric" id="quadPower">87.5%</div>
+                    <div class="quad-description">
+                        <strong>Metric:</strong> Max power utilization vs TDP<br>
+                        <strong>Purpose:</strong> Full GPU utilization without bottlenecks
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DCIM Control Plane Flow -->
+    <section id="telemetry" class="section">
+        <div class="container">
+            <h2 class="section-title">DCIM Control Plane Flow</h2>
+            <p class="section-subtitle">Telemetry progression from sensing to proof</p>
+
+            <div class="grid grid-2" style="margin-top: 2rem;">
+                <div class="card">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-title">1. Sense & Sync</div>
+                            <div class="timeline-description">
+                                PTP-aligned telemetry from DCGM, PDUs, BMS, and environmental sensors
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-title">2. Correlate & Detect</div>
+                            <div class="timeline-description">
+                                Cross-layer anomaly detection using ML models on streaming data
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-title">3. Optimize & Act</div>
+                            <div class="timeline-description">
+                                Predictive cooling adjustments and proactive job relocation
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-title">4. Report & Prove</div>
+                            <div class="timeline-description">
+                                SLA evidence generation and ROI reporting for customers
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-bottom: 1rem;">Telemetry Signals</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Signal</th>
+                                <th>Source</th>
+                                <th>Frequency</th>
+                            </tr>
+                        </thead>
+                        <tbody id="telemetryTable">
+                            <tr><td colspan="3" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ISA-95 5-Layer Breakdown -->
+    <section id="isa95" class="section" style="background: var(--surface);">
+        <div class="container">
+            <h2 class="section-title">ISA-95 5-Layer Digital Architecture</h2>
+            <p class="section-subtitle">Hierarchical data center digitalization framework</p>
+
+            <div class="layer-stack" style="margin-top: 2rem;" id="isa95Layers">
+                <div class="card"><p style="text-align: center; color: var(--text-muted);">Loading...</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Peak Shaving Strategy -->
+    <section id="peak-shaving" class="section">
+        <div class="container">
+            <h2 class="section-title">Peak Shaving Strategy</h2>
+            <p class="section-subtitle">5-step approach to reduce demand charges</p>
+
+            <div class="grid grid-2" style="margin-top: 2rem;">
+                <div class="card">
+                    <h3 style="margin-bottom: 1rem;">Strategy Steps</h3>
+                    <div id="peakShavingSteps">
+                        <p style="text-align: center; color: var(--text-muted);">Loading...</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-bottom: 1rem;">Current Status</h3>
+                    <div id="peakShavingStatus">
+                        <p style="text-align: center; color: var(--text-muted);">Loading...</p>
+                    </div>
+
+                    <div style="margin-top: 2rem;">
+                        <h4 style="margin-bottom: 0.5rem;">Estimated Savings</h4>
+                        <div class="chart-placeholder">
+                            Peak demand reduction: <strong>15-25%</strong><br>
+                            Monthly cost savings: <strong>$12K-$18K</strong><br>
+                            ROI period: <strong>18-24 months</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Integration -->
+    <section class="section" style="background: var(--surface);">
+        <div class="container">
+            <h2 class="section-title">API Integration</h2>
+            <p class="section-subtitle">Connect your monitoring tools to LightOS DCIM API</p>
+
+            <div class="card" style="margin-top: 2rem;">
+                <h3 style="margin-bottom: 1rem;">Available Endpoints</h3>
+
+                <div class="api-endpoint">
+                    <strong>GET</strong> /api/dcim/kpi
+                    <br><span style="color: var(--text-muted);">Get real-time KPI dashboard data</span>
+                </div>
+
+                <div class="api-endpoint">
+                    <strong>GET</strong> /api/dcim/cluster
+                    <br><span style="color: var(--text-muted);">Get cluster-wide metrics</span>
+                </div>
+
+                <div class="api-endpoint">
+                    <strong>GET</strong> /api/dcim/gpu/{gpu_id}
+                    <br><span style="color: var(--text-muted);">Get metrics for specific GPU</span>
+                </div>
+
+                <div class="api-endpoint">
+                    <strong>GET</strong> /api/dcim/power
+                    <br><span style="color: var(--text-muted);">Get power distribution metrics</span>
+                </div>
+
+                <div class="api-endpoint">
+                    <strong>GET</strong> /api/dcim/thermal
+                    <br><span style="color: var(--text-muted);">Get cooling system metrics</span>
+                </div>
+
+                <div class="api-endpoint">
+                    <strong>WS</strong> /ws/dcim
+                    <br><span style="color: var(--text-muted);">Real-time telemetry streaming (1 Hz)</span>
+                </div>
+
+                <div style="margin-top: 1.5rem;">
+                    <a href="#" onclick="window.open(API_BASE + '/docs', '_blank'); return false;" class="btn btn-primary">View Full API Documentation</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- JavaScript for real-time data -->
+    <script>
+        // Auto-detect environment: use localhost for development, deployed API for production
+        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:8001'
+            : 'https://lightos-dcim-api.onrender.com';  // Update this with your deployed API URL
+
+        console.log('DCIM Dashboard loaded. API Base:', API_BASE);
+        let ws = null;
+
+        // Update KPI cards
+        function updateKPIs(data) {
+            document.getElementById('clockStability').textContent = data.clock_stability_pct.toFixed(1);
+            document.getElementById('clockStabilityBar').style.width = data.clock_stability_pct + '%';
+
+            document.getElementById('throttleEvents').textContent = data.throttle_events_count;
+            document.getElementById('throttleBar').style.width = (data.throttle_events_count === 0 ? 100 : 50) + '%';
+            document.getElementById('throttleBar').style.background = data.throttle_events_count === 0 ? 'var(--success)' : 'var(--warning)';
+
+            document.getElementById('thermalHeadroom').textContent = data.thermal_headroom_c.toFixed(1);
+            document.getElementById('thermalBar').style.width = Math.min(data.thermal_headroom_c * 4, 100) + '%';
+
+            document.getElementById('powerUtil').textContent = data.power_utilization_pct.toFixed(1);
+            document.getElementById('powerBar').style.width = data.power_utilization_pct + '%';
+
+            document.getElementById('aiOEE').textContent = data.ai_oee_pct.toFixed(1);
+            document.getElementById('oeeBar').style.width = data.ai_oee_pct + '%';
+
+            document.getElementById('mfu').textContent = data.mfu_pct.toFixed(1);
+            document.getElementById('mfuBar').style.width = data.mfu_pct + '%';
+
+            document.getElementById('savings').textContent = '$' + data.peak_shaving_savings_usd.toFixed(0);
+            document.getElementById('pue').textContent = data.pue.toFixed(2);
+
+            // Update quad cards
+            document.getElementById('quadClock').textContent = data.clock_stability_pct.toFixed(1) + '%';
+            document.getElementById('quadThrottle').textContent = data.throttle_events_count;
+            document.getElementById('quadThermal').textContent = data.thermal_headroom_c.toFixed(1) + '°C';
+            document.getElementById('quadPower').textContent = data.power_utilization_pct.toFixed(1) + '%';
+
+            document.getElementById('lastUpdate').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+        }
+
+        // Fetch KPI data
+        async function fetchKPIs() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dcim/kpi`);
+                const data = await response.json();
+                updateKPIs(data);
+            } catch (error) {
+                console.error('Error fetching KPIs:', error);
+                document.getElementById('lastUpdate').textContent = 'Error: API not running';
+            }
+        }
+
+        // Fetch telemetry signals
+        async function fetchTelemetry() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dcim/telemetry`);
+                const data = await response.json();
+
+                const tbody = document.getElementById('telemetryTable');
+                tbody.innerHTML = data.signals.slice(0, 6).map(signal => `
+                    <tr>
+                        <td>${signal.signal}</td>
+                        <td><code>${signal.source}</code></td>
+                        <td>${signal.frequency}</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error fetching telemetry:', error);
+            }
+        }
+
+        // Fetch ISA-95 layers
+        async function fetchISA95() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dcim/isa95`);
+                const data = await response.json();
+
+                const container = document.getElementById('isa95Layers');
+                container.innerHTML = data.layers.map(layer => `
+                    <div class="layer-card">
+                        <div class="layer-header">
+                            <div class="layer-title">${layer.layer}: ${layer.name}</div>
+                            <div class="layer-level">${layer.isa95_level}</div>
+                        </div>
+                        <div class="layer-description">${layer.description}</div>
+                        <div class="layer-components">
+                            ${layer.components.map(comp => `<span class="component-tag">${comp}</span>`).join('')}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error fetching ISA-95:', error);
+            }
+        }
+
+        // Fetch peak shaving strategy
+        async function fetchPeakShaving() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dcim/peak-shaving`);
+                const data = await response.json();
+
+                const stepsContainer = document.getElementById('peakShavingSteps');
+                stepsContainer.innerHTML = `
+                    <div class="timeline">
+                        ${data.strategy.map(step => `
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-title">${step.step}. ${step.name}</div>
+                                <div class="timeline-description">${step.description}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                const statusContainer = document.getElementById('peakShavingStatus');
+                statusContainer.innerHTML = `
+                    <table>
+                        <tr>
+                            <td><strong>Active Strategies</strong></td>
+                            <td>${data.current_status.active_strategies.join(', ')}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ESS Mode</strong></td>
+                            <td><span class="status-badge status-optimal">${data.current_status.ess_mode}</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Predicted Peak</strong></td>
+                            <td>${data.current_status.predicted_peak_kw.toFixed(1)} kW</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Savings Today</strong></td>
+                            <td>$${data.current_status.savings_today_usd.toFixed(2)}</td>
+                        </tr>
+                    </table>
+                `;
+            } catch (error) {
+                console.error('Error fetching peak shaving:', error);
+            }
+        }
+
+        // Initialize
+        async function init() {
+            await fetchKPIs();
+            await fetchTelemetry();
+            await fetchISA95();
+            await fetchPeakShaving();
+
+            // Refresh KPIs every 2 seconds
+            setInterval(fetchKPIs, 2000);
+        }
+
+        // Start when page loads
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
