@@ -226,6 +226,202 @@ class KaggleDataLoader:
             print(f"Error loading thermal data: {e}")
             return self._generate_simulated_thermal_data()
 
+    def load_sustainable_ai_data(self, file_path: Optional[Path] = None) -> pd.DataFrame:
+        """
+        Load Sustainable AI Model Efficiency dataset
+        Dataset: yldrmmahmud/sustainable-ai-model-efficiency-co2-and-energy
+
+        Args:
+            file_path: Path to CSV file (optional)
+
+        Returns:
+            DataFrame with AI model efficiency metrics
+        """
+        if file_path is None:
+            file_path = self.dataset_path / "sustainable_ai"
+
+        # Try to find CSV files in the directory
+        if file_path.is_dir():
+            csv_files = list(file_path.glob("*.csv"))
+            if csv_files:
+                file_path = csv_files[0]
+            else:
+                print(f"No CSV files found in {file_path}")
+                return pd.DataFrame()
+
+        if not file_path.exists():
+            print(f"Sustainable AI data not found at {file_path}")
+            print("Run: python kaggle_downloader.py")
+            return pd.DataFrame()
+
+        try:
+            df = pd.read_csv(file_path)
+            print(f"✓ Loaded {len(df)} records from Sustainable AI dataset")
+            print(f"  Columns: {', '.join(df.columns[:5])}...")
+
+            # Cache the data
+            self.sustainable_ai_data = df
+            return df
+
+        except Exception as e:
+            print(f"Error loading Sustainable AI data: {e}")
+            return pd.DataFrame()
+
+    def load_datacenter_energy_data(self, file_path: Optional[Path] = None) -> pd.DataFrame:
+        """
+        Load Global Data Centre Energy Footprints dataset
+        Dataset: thedevastator/global-data-centre-energy-footprints
+
+        Args:
+            file_path: Path to CSV file (optional)
+
+        Returns:
+            DataFrame with datacenter energy metrics
+        """
+        if file_path is None:
+            file_path = self.dataset_path / "datacenter_energy"
+
+        # Try to find CSV files in the directory
+        if file_path.is_dir():
+            csv_files = list(file_path.glob("*.csv"))
+            if csv_files:
+                file_path = csv_files[0]
+            else:
+                print(f"No CSV files found in {file_path}")
+                return pd.DataFrame()
+
+        if not file_path.exists():
+            print(f"Datacenter Energy data not found at {file_path}")
+            print("Run: python kaggle_downloader.py")
+            return pd.DataFrame()
+
+        try:
+            df = pd.read_csv(file_path)
+            print(f"✓ Loaded {len(df)} records from Datacenter Energy dataset")
+            print(f"  Columns: {', '.join(df.columns[:5])}...")
+
+            # Cache the data
+            self.datacenter_energy_data = df
+            return df
+
+        except Exception as e:
+            print(f"Error loading Datacenter Energy data: {e}")
+            return pd.DataFrame()
+
+    def analyze_sustainable_ai_metrics(self) -> Dict[str, Any]:
+        """
+        Analyze Sustainable AI dataset for energy efficiency insights
+
+        Returns:
+            Dictionary with analysis results
+        """
+        if self.sustainable_ai_data is None or self.sustainable_ai_data.empty:
+            return {"error": "No data loaded. Run load_sustainable_ai_data() first"}
+
+        df = self.sustainable_ai_data
+
+        analysis = {
+            "total_models": len(df),
+            "columns": list(df.columns),
+            "energy_stats": {},
+            "co2_stats": {}
+        }
+
+        # Find energy-related columns
+        energy_cols = [col for col in df.columns if any(
+            keyword in col.lower() for keyword in ['energy', 'power', 'watt', 'kwh']
+        )]
+
+        if energy_cols:
+            for col in energy_cols[:3]:  # Analyze first 3 energy columns
+                try:
+                    analysis["energy_stats"][col] = {
+                        "mean": float(df[col].mean()),
+                        "median": float(df[col].median()),
+                        "min": float(df[col].min()),
+                        "max": float(df[col].max()),
+                        "std": float(df[col].std())
+                    }
+                except:
+                    pass
+
+        # Find CO2-related columns
+        co2_cols = [col for col in df.columns if any(
+            keyword in col.lower() for keyword in ['co2', 'carbon', 'emission']
+        )]
+
+        if co2_cols:
+            for col in co2_cols[:3]:
+                try:
+                    analysis["co2_stats"][col] = {
+                        "mean": float(df[col].mean()),
+                        "median": float(df[col].median()),
+                        "min": float(df[col].min()),
+                        "max": float(df[col].max()),
+                        "std": float(df[col].std())
+                    }
+                except:
+                    pass
+
+        return analysis
+
+    def analyze_datacenter_energy_metrics(self) -> Dict[str, Any]:
+        """
+        Analyze Datacenter Energy dataset for power consumption insights
+
+        Returns:
+            Dictionary with analysis results
+        """
+        if self.datacenter_energy_data is None or self.datacenter_energy_data.empty:
+            return {"error": "No data loaded. Run load_datacenter_energy_data() first"}
+
+        df = self.datacenter_energy_data
+
+        analysis = {
+            "total_records": len(df),
+            "columns": list(df.columns),
+            "power_stats": {},
+            "efficiency_stats": {}
+        }
+
+        # Find power-related columns
+        power_cols = [col for col in df.columns if any(
+            keyword in col.lower() for keyword in ['power', 'energy', 'load', 'kwh', 'mw']
+        )]
+
+        if power_cols:
+            for col in power_cols[:3]:
+                try:
+                    analysis["power_stats"][col] = {
+                        "mean": float(df[col].mean()),
+                        "median": float(df[col].median()),
+                        "min": float(df[col].min()),
+                        "max": float(df[col].max()),
+                        "std": float(df[col].std())
+                    }
+                except:
+                    pass
+
+        # Find efficiency-related columns
+        efficiency_cols = [col for col in df.columns if any(
+            keyword in col.lower() for keyword in ['pue', 'efficiency', 'utilization']
+        )]
+
+        if efficiency_cols:
+            for col in efficiency_cols[:3]:
+                try:
+                    analysis["efficiency_stats"][col] = {
+                        "mean": float(df[col].mean()),
+                        "median": float(df[col].median()),
+                        "min": float(df[col].min()),
+                        "max": float(df[col].max()),
+                        "std": float(df[col].std())
+                    }
+                except:
+                    pass
+
+        return analysis
+
     def get_sample_at_time(self, dataset: str, timestamp: pd.Timestamp) -> Dict[str, Any]:
         """
         Get a sample from the dataset at specific time

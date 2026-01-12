@@ -5,3 +5,4 @@ python-multipart==0.0.6
 pydantic==2.5.3
 pandas==2.1.4
 numpy==1.26.2
+kagglehub>=0.2.0
