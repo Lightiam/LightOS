@@ -1,0 +1,476 @@
+Build a complete AI-powered development environment called "LightOS Dev Environment" with the following features:
+
+## CORE CONCEPT
+An autonomous app builder that takes a single text prompt and generates a fully working web application with real-time build server, live preview, and hot-reload capabilities. Think "Lovable but with actual build server and preview."
+
+## MAIN COMPONENTS TO BUILD
+
+### 1. HOME PAGE / DASHBOARD
+**URL:** /
+**Design:** Dark theme with indigo/teal accent colors, modern glass-morphism UI
+
+**Header:**
+- Logo: "LightOS Dev Environment"
+- Tagline: "Turn ideas into apps with AI"
+- Navigation: Home | Build | Projects | Templates | Docs
+
+**Hero Section:**
+- Large heading: "Build Apps from Single Prompts"
+- Subheading: "AI-powered development with build server & live preview"
+- Feature badges:
+  * "✅ Code Generation"
+  * "✅ Build Server"
+  * "✅ Live Preview"
+  * "✅ Hot Reload"
+  * "✅ AI Auto-Fix"
+
+**Quick Start Card:**
+- Text area for app description (placeholder: "Describe your app idea...")
+- Model selector dropdown: GLM-4 9B, Qwen2.5-Coder 7B, Llama 3.1 8B
+- Stack selector: React+FastAPI (default), Next.js+Supabase, Vue+Express
+- Big "Build App" button (gradient, animated)
+
+**Stats Dashboard:**
+- Total apps built: 0 (increments)
+- Build success rate: 100%
+- Average build time: 3.5 min
+- Active projects: Show count
+
+### 2. BUILD PAGE
+**URL:** /build
+**Real-time build interface**
+
+**Left Panel (30% width):**
+- App idea text area (multi-line, syntax highlighting)
+- Configuration section:
+  * Project name input
+  * Tech stack selector (React+FastAPI, Next.js+Supabase, Vue+Express, Python Full Stack)
+  * Model selector (GLM-4 9B, Qwen2.5-Coder, etc.)
+  * Max iterations slider (1-10, default 5)
+  * Auto-fix toggle (ON by default)
+- Build button (large, prominent)
+- Example prompts dropdown with:
+  * "Todo app with auth and CRUD"
+  * "E-commerce store with cart"
+  * "Analytics dashboard with charts"
+  * "Blog with posts and comments"
+  * "Social media feed"
+
+**Center Panel (40% width) - Build Progress:**
+- Phase indicator (visual timeline):
+  1. Understanding (with checkmark when done)
+  2. Planning (with checkmark when done)
+  3. Building (with progress bar)
+  4. Testing (with checkmark when done)
+  5. Deploying (with checkmark when done)
+
+- Real-time log viewer:
+  * Color-coded messages (info=blue, success=green, error=red, warning=yellow)
+  * Auto-scroll
+  * Timestamps
+  * Expandable details
+
+- Current action display:
+  * Big status text: "Generating React components..."
+  * Progress bar underneath
+  * File counter: "Created 12/20 files"
+
+**Right Panel (30% width) - Generated Plan:**
+Once planning phase completes, show JSON plan:
+```json
+{
+  "app_summary": "...",
+  "pages": ["Home", "Dashboard", ...],
+  "data_models": ["User", "Task", ...],
+  "api_endpoints": ["/api/...", ...],
+  "key_flows": ["User can...", ...]
+}
+```
+
+**Bottom Panel (expandable):**
+- Build logs (terminal-style, monospace font)
+- Errors/warnings list with line numbers
+- File tree of generated project
+
+### 3. PREVIEW PAGE
+**URL:** /preview/:projectId
+**Split screen layout**
+
+**Left Side (50%):**
+- Live preview iframe showing the built app
+- URL bar showing: http://localhost:5173 (simulated)
+- Reload button
+- Device size selector: Desktop | Tablet | Mobile
+- "Open in New Tab" button
+
+**Right Side (50%):**
+- Tabbed interface:
+
+  **Tab 1: Code Editor**
+  - File tree on left (20% width)
+  - Code editor on right (Monaco Editor)
+  - Syntax highlighting
+  - When file is edited, show "Save" button
+  - On save, trigger "hot reload" animation in preview
+
+  **Tab 2: Build Logs**
+  - Real-time build output
+  - Color-coded (errors in red, success in green)
+  - Auto-scroll
+  - Clear button
+
+  **Tab 3: API Docs**
+  - Swagger/OpenAPI style interface
+  - List all API endpoints
+  - Method badges (GET, POST, PUT, DELETE)
+  - Try it out functionality
+  - Request/response examples
+
+  **Tab 4: Database**
+  - Show data models as tables
+  - Mock data viewer
+  - Add/Edit/Delete rows (mock)
+
+**Top Bar:**
+- Project name
+- Status indicator: "Running" (green pulse)
+- Preview URL: http://localhost:5173
+- API URL: http://localhost:8000
+- Stop/Restart buttons
+
+### 4. PROJECTS PAGE
+**URL:** /projects
+**Grid layout of project cards**
+
+**Filters (top bar):**
+- Search box
+- Filter by stack: All | React | Next.js | Vue | Python
+- Sort by: Recent | Name | Status
+
+**Project Card:**
+- Project thumbnail (screenshot or placeholder)
+- Project name
+- Tech stack badges (React, FastAPI, PostgreSQL, etc.)
+- Created date
+- Status badge: Running | Stopped | Building | Failed
+- Quick actions:
+  * "Open Preview" button
+  * "View Code" button
+  * "Edit" button
+  * "Delete" button (with confirmation)
+- Build stats:
+  * Build time: 3m 42s
+  * Files: 24
+  * Lines of code: 2,431
+
+**Empty State:**
+- Illustration
+- "No projects yet"
+- "Build your first app" button
+
+### 5. TEMPLATES PAGE
+**URL:** /templates
+**Template showcase**
+
+**Template Cards (grid layout):**
+
+**Card 1: React + FastAPI**
+- Preview image (dashboard UI)
+- Name: "React + FastAPI"
+- Stack badges: React, Vite, Tailwind, FastAPI, PostgreSQL
+- Best for: "Data-driven apps, dashboards, admin panels"
+- Features list:
+  * React 18 with Vite
+  * Tailwind CSS
+  * FastAPI backend
+  * PostgreSQL database
+  * JWT authentication
+- "Use Template" button
+- "View Demo" button
+
+**Card 2: Next.js + Supabase**
+- Preview image (blog layout)
+- Name: "Next.js + Supabase"
+- Stack: Next.js, Tailwind, Supabase
+- Best for: "Content sites, blogs, e-commerce"
+- Features:
+  * Server-side rendering
+  * Supabase auth
+  * Real-time database
+  * File storage
+- Buttons
+
+**Card 3: Vue + Express**
+- Preview image (chat UI)
+- Name: "Vue + Express"
+- Stack: Vue 3, Express, PostgreSQL
+- Best for: "PWAs, real-time apps"
+- Features:
+  * Vue 3 Composition API
+  * Express REST API
+  * WebSocket support
+  * JWT auth
+- Buttons
+
+**Card 4: Python Full Stack**
+- Preview image (data viz dashboard)
+- Name: "Python Full Stack"
+- Stack: Streamlit, FastAPI, PostgreSQL
+- Best for: "Data science, ML dashboards"
+- Features:
+  * Streamlit UI
+  * FastAPI model serving
+  * Plotly charts
+  * Pandas integration
+- Buttons
+
+**When "Use Template" clicked:**
+- Modal opens
+- "Describe your app" text area
+- "Project name" input
+- "Build from Template" button
+- Modal shows the template will be used as starting point
+
+### 6. DOCUMENTATION PAGE
+**URL:** /docs
+**Clean documentation layout**
+
+**Sidebar (20% width):**
+- Getting Started
+  * Quick Start
+  * Installation
+  * First App
+- Guides
+  * Build Commands
+  * Templates
+  * Configuration
+  * Hot Reload
+- API Reference
+  * Build API
+  * Preview API
+  * Projects API
+- Examples
+  * Todo App
+  * E-commerce
+  * Dashboard
+  * Social Network
+
+**Content Area (80% width):**
+- Markdown-style documentation
+- Code blocks with syntax highlighting
+- Copy button on code blocks
+- Screenshots/GIFs showing features
+- "Try it now" buttons that link to /build
+
+## BACKEND FUNCTIONALITY TO SIMULATE
+
+### Build Process Simulation
+When user clicks "Build App":
+
+1. **Phase 1: Understanding (5 seconds)**
+   - Show animated thinking indicator
+   - Display: "Analyzing prompt..."
+   - Log: "✓ Understood: Building a [type] application"
+
+2. **Phase 2: Planning (10 seconds)**
+   - Display: "Creating app plan..."
+   - Generate and show JSON plan in right panel
+   - Log each item:
+     * "✓ Identified 5 pages"
+     * "✓ Designed 3 data models"
+     * "✓ Planned 8 API endpoints"
+
+3. **Phase 3: Building (30 seconds)**
+   - Progress bar from 0-100%
+   - Simulate file creation:
+     * "Creating package.json..."
+     * "Generating React components..."
+     * "Setting up FastAPI backend..."
+     * "Configuring database models..."
+   - File counter incrementing: "12/24 files created"
+
+4. **Phase 4: Installing (15 seconds)**
+   - Display: "Installing dependencies..."
+   - Mock npm install output
+   - Progress bar
+
+5. **Phase 5: Building (10 seconds)**
+   - Display: "Compiling app..."
+   - Mock Vite build output
+   - Show "Build complete!" with success animation
+
+6. **Phase 6: Starting (5 seconds)**
+   - Display: "Starting dev server..."
+   - Show URLs:
+     * "Frontend: http://localhost:5173"
+     * "API: http://localhost:8000"
+   - Success animation
+   - "Open Preview" button appears
+
+### Mock Preview
+Generate a simple working preview based on the prompt:
+- For "todo app": Show a todo list UI
+- For "dashboard": Show charts and metrics
+- For "blog": Show posts list and post detail
+- For "e-commerce": Show product grid and cart
+
+### Hot Reload Simulation
+When code is edited in preview page:
+- Show "Saving..." indicator
+- Wait 1 second
+- Show "Hot reload" toast notification
+- Refresh preview iframe with a smooth animation
+- Log: "✓ Changes applied in 0.8s"
+
+## KEY FEATURES TO IMPLEMENT
+
+### 1. Real-Time Updates
+- Use WebSocket or polling to simulate build progress
+- Update UI smoothly as build progresses
+- Show confetti animation when build succeeds
+- Show error modal if build fails
+
+### 2. Code Editor
+- Monaco Editor integration (same as VS Code)
+- Syntax highlighting for JS, JSX, Python, CSS
+- Auto-complete
+- Line numbers
+- Minimap
+
+### 3. Project Management
+- Store projects in local storage or database
+- Track project metadata (name, created date, stack, status)
+- Allow renaming projects
+- Allow deleting projects with confirmation
+
+### 4. Example Prompts
+Pre-populate with smart examples that work well:
+- "Build a todo app with user authentication, task creation, editing, deletion, and completion tracking"
+- "Build an e-commerce store with product catalog, shopping cart, checkout, and admin panel"
+- "Build an analytics dashboard with line charts, bar charts, KPIs, date filtering, and CSV export"
+- "Build a blog platform with posts, comments, likes, user profiles, and markdown editor"
+- "Build a social media feed with posts, comments, likes, followers, and real-time updates"
+
+### 5. Build Settings
+Advanced settings (collapsible panel):
+- Enable TypeScript (checkbox)
+- Enable ESLint (checkbox)
+- Enable Prettier (checkbox)
+- Enable testing (checkbox)
+- Database type: PostgreSQL | SQLite | MongoDB
+- Auth provider: JWT | Supabase | Auth0
+
+### 6. Templates System
+Allow users to save their builds as custom templates:
+- "Save as Template" button on preview page
+- Template name input
+- Template description
+- Make public/private toggle
+- Templates appear in templates page
+
+## DESIGN REQUIREMENTS
+
+### Color Scheme
+- Primary: Indigo (#4F46E5)
+- Secondary: Teal (#06B6D4)
+- Background: Dark slate (#0f172a)
+- Cards: Slightly lighter slate (#1e293b)
+- Text: White (#ffffff)
+- Muted text: Gray (#94a3b8)
+- Success: Green (#10b981)
+- Error: Red (#ef4444)
+- Warning: Yellow (#f59e0b)
+
+### Typography
+- Headings: Inter font, bold
+- Body: Inter font, regular
+- Code: JetBrains Mono, monospace
+
+### Components
+- Use shadcn/ui or similar modern component library
+- Smooth animations (framer-motion)
+- Glass-morphism effects on cards
+- Gradient buttons
+- Subtle hover effects
+- Loading skeletons
+- Toast notifications for actions
+
+### Responsive Design
+- Mobile-first approach
+- Tablet: Stack panels vertically
+- Desktop: Side-by-side layouts
+- Mobile: Bottom navigation
+
+## TECHNICAL STACK FOR LOVABLE
+
+Use these technologies:
+- **Frontend:** React + TypeScript + Vite
+- **Styling:** Tailwind CSS
+- **UI Components:** shadcn/ui
+- **Routing:** React Router
+- **State:** Zustand or React Context
+- **Code Editor:** Monaco Editor
+- **Charts:** Recharts or Chart.js
+- **Animations:** Framer Motion
+- **Icons:** Lucide React
+- **Backend:** Supabase (for storing projects)
+- **Auth:** Supabase Auth (optional, for multi-user)
+
+## USER FLOWS
+
+### Flow 1: First Time User
+1. Lands on home page
+2. Sees hero section with quick start
+3. Types app idea in text area
+4. Clicks "Build App"
+5. Redirects to /build with progress
+6. Watches real-time build progress (2-3 minutes simulation)
+7. Build completes with success animation
+8. Clicks "Open Preview"
+9. Sees working app in split-screen preview
+10. Can edit code and see hot reload
+
+### Flow 2: Template User
+1. Navigates to /templates
+2. Browses available templates
+3. Clicks "Use Template" on React+FastAPI
+4. Modal opens with customization
+5. Enters app description
+6. Clicks "Build from Template"
+7. Redirects to /build
+8. Build starts with template as base
+9. Preview shows customized template
+
+### Flow 3: Returning User
+1. Lands on home page
+2. Sees "Recent Projects" section
+3. Clicks on existing project
+4. Opens in preview page
+5. Can continue editing
+6. Can restart build with new prompt
+
+## COMPARISON TABLE (show on homepage)
+
+| Feature | Lovable | LightOS Dev |
+|---------|---------|-------------|
+| Code Generation | ✅ | ✅ |
+| Build Server | ❌ | ✅ |
+| Live Preview | ❌ | ✅ |
+| Hot Reload | ❌ | ✅ |
+| AI Auto-Fix | ❌ | ✅ |
+| Local Dev | ❌ | ✅ |
+
+## MOCK DATA
+
+Generate realistic mock data for demos:
+- Sample projects (5-10)
+- Sample build logs
+- Sample generated code
+- Sample API responses
+
+## CALL-TO-ACTION
+
+Main CTA: "Build Your First App"
+Secondary: "Try Example" | "View Templates" | "Read Docs"
+
+Build this as a fully functional web application that SIMULATES the complete LightOS development environment. Focus on the user experience, smooth animations, and making it feel like a real autonomous development tool.

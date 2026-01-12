@@ -1,13 +1,19 @@
-# Netlify Configuration for LightOS Documentation
+# Netlify Configuration for LightOS DCIM Dashboard
 
 [build]
   # Publish directory
   publish = "docs-site"
 
   # No build command needed for static site
-  command = "echo 'No build required'"
+  command = "echo 'Deploying LightOS DCIM Dashboard'"
 
-# Redirect rules
+# Redirect root to DCIM dashboard
+[[redirects]]
+  from = "/"
+  to = "/dcim.html"
+  status = 302
+
+# Redirect documentation paths
 [[redirects]]
   from = "/docs/*"
   to = "/guides/:splat"
@@ -18,7 +24,22 @@
   to = "/api/:splat"
   status = 200
 
-# Headers for security
+# DCIM API Proxy (Update this URL with your deployed API)
+# To deploy the API, see: dcim-api/DEPLOY_API.md
+[[redirects]]
+  from = "/api/dcim/*"
+  to = "http://localhost:8001/api/dcim/:splat"
+  status = 200
+  force = false
+
+# WebSocket proxy for real-time telemetry
+[[redirects]]
+  from = "/ws/dcim"
+  to = "ws://localhost:8001/ws/dcim"
+  status = 200
+  force = false
+
+# Headers for security and CORS
 [[headers]]
   for = "/*"
   [headers.values]
@@ -26,6 +47,9 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
 
 # Cache static assets
 [[headers]]

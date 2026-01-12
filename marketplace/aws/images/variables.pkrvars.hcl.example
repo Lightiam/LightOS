@@ -1,0 +1,27 @@
+# LightOS Packer Variables
+# Copy this file to variables.pkrvars.hcl and customize
+
+# AWS Region to build AMI
+aws_region = "us-east-1"
+
+# LightOS version
+lightos_version = "0.2.1"
+
+# EC2 instance type for building
+# Must be a GPU instance for driver installation
+# Options:
+#   g4dn.xlarge  - 4 vCPU, 16GB RAM, 1x T4 GPU (recommended)
+#   g4dn.2xlarge - 8 vCPU, 32GB RAM, 1x T4 GPU
+#   g5.xlarge    - 4 vCPU, 16GB RAM, 1x A10G GPU
+instance_type = "g4dn.xlarge"
+
+# Root volume size in GB
+# Minimum: 50GB
+# Recommended: 100GB
+volume_size = 100
+
+# AMI name prefix
+ami_name_prefix = "LightOS"
+
+# SSH username (Ubuntu default)
+ssh_username = "ubuntu"

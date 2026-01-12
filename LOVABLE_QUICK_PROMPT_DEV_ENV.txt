@@ -1,0 +1,81 @@
+Build "LightOS Dev Environment" - an AI-powered app builder with real-time preview
+
+PAGES:
+
+1. HOME (/)
+- Hero: "Build Apps from Single Prompts" + "AI-powered development with build server & live preview"
+- Quick start card: Text area for app idea + "Build App" button
+- Feature badges: ✅ Code Generation ✅ Build Server ✅ Live Preview ✅ Hot Reload ✅ AI Auto-Fix
+- Stats: Total apps built, Success rate, Average build time
+- Dark theme, indigo/teal colors, glass-morphism UI
+
+2. BUILD (/build)
+Split layout:
+- LEFT (30%): App description textarea, Stack selector (React+FastAPI/Next.js+Supabase/Vue+Express), Model selector (GLM-4/Qwen/Llama), Build button, Example prompts
+- CENTER (40%): Build progress timeline (Understanding→Planning→Building→Testing→Deploying), Real-time logs with colors, Progress bars, File counter
+- RIGHT (30%): Generated plan JSON showing pages/models/APIs/flows
+
+Build simulation (75 seconds total):
+1. Understanding (5s) - "Analyzing prompt..."
+2. Planning (10s) - Generate JSON plan
+3. Building (30s) - "Creating files..." with progress bar
+4. Installing (15s) - "npm install" simulation
+5. Compiling (10s) - "Vite build" output
+6. Starting (5s) - Show URLs, "Open Preview" button
+
+3. PREVIEW (/preview/:id)
+Split screen:
+- LEFT (50%): Live preview iframe, URL bar (localhost:5173), Device selector (Desktop/Tablet/Mobile), Reload button
+- RIGHT (50%): Tabs:
+  * Code Editor (Monaco) with file tree, syntax highlighting, save button triggers hot-reload
+  * Build Logs (color-coded terminal)
+  * API Docs (Swagger-style with endpoints, methods, try-it-out)
+  * Database (tables, mock data viewer)
+- Top bar: Project name, Status (green pulse), URLs, Stop/Restart buttons
+
+4. PROJECTS (/projects)
+Grid of project cards:
+- Thumbnail, name, stack badges, created date, status badge
+- Actions: Open Preview, View Code, Edit, Delete
+- Stats: Build time, files count, lines of code
+- Filters: Search, Stack filter, Sort options
+
+5. TEMPLATES (/templates)
+Template cards with:
+- Preview image, name, stack badges, "Best for" description
+- Features list, "Use Template" button
+- Templates: React+FastAPI (dashboards), Next.js+Supabase (content), Vue+Express (PWAs), Python (data science)
+
+6. DOCS (/docs)
+Sidebar navigation + markdown content area
+Sections: Getting Started, Guides, API Reference, Examples
+
+FEATURES:
+- Real-time build progress with WebSocket/polling simulation
+- Monaco code editor with syntax highlighting
+- Hot reload animation when code changes
+- Project storage (local storage or Supabase)
+- Confetti on successful build
+- Error modals on failure
+- Responsive: mobile-first, stacks on tablet
+
+EXAMPLE PROMPTS:
+- "Todo app with auth, CRUD operations"
+- "E-commerce store with cart and checkout"
+- "Analytics dashboard with charts and export"
+- "Blog with posts, comments, markdown editor"
+
+MOCK PREVIEW:
+Generate simple working UI based on prompt:
+- Todo app → todo list interface
+- Dashboard → charts and KPIs
+- Blog → posts grid
+- E-commerce → product catalog
+
+TECH STACK:
+React + TypeScript + Vite + Tailwind + shadcn/ui + React Router + Zustand + Monaco Editor + Recharts + Framer Motion + Lucide Icons + Supabase
+
+COLOR SCHEME:
+Primary: Indigo (#4F46E5), Secondary: Teal (#06B6D4), Background: Dark slate (#0f172a), Success: Green, Error: Red
+
+Make it feel like a real autonomous development tool with smooth animations and professional UX.
