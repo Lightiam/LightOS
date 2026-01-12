@@ -708,37 +708,37 @@
                 <h3 style="margin-bottom: 1rem;">Available Endpoints</h3>
 
                 <div class="api-endpoint">
-                    <strong>GET</strong> http://localhost:8001/api/dcim/kpi
+                    <strong>GET</strong> /api/dcim/kpi
                     <br><span style="color: var(--text-muted);">Get real-time KPI dashboard data</span>
                 </div>
 
                 <div class="api-endpoint">
-                    <strong>GET</strong> http://localhost:8001/api/dcim/cluster
+                    <strong>GET</strong> /api/dcim/cluster
                     <br><span style="color: var(--text-muted);">Get cluster-wide metrics</span>
                 </div>
 
                 <div class="api-endpoint">
-                    <strong>GET</strong> http://localhost:8001/api/dcim/gpu/{gpu_id}
+                    <strong>GET</strong> /api/dcim/gpu/{gpu_id}
                     <br><span style="color: var(--text-muted);">Get metrics for specific GPU</span>
                 </div>
 
                 <div class="api-endpoint">
-                    <strong>GET</strong> http://localhost:8001/api/dcim/power
+                    <strong>GET</strong> /api/dcim/power
                     <br><span style="color: var(--text-muted);">Get power distribution metrics</span>
                 </div>
 
                 <div class="api-endpoint">
-                    <strong>GET</strong> http://localhost:8001/api/dcim/thermal
+                    <strong>GET</strong> /api/dcim/thermal
                     <br><span style="color: var(--text-muted);">Get cooling system metrics</span>
                 </div>
 
                 <div class="api-endpoint">
-                    <strong>WS</strong> ws://localhost:8001/ws/dcim
+                    <strong>WS</strong> /ws/dcim
                     <br><span style="color: var(--text-muted);">Real-time telemetry streaming (1 Hz)</span>
                 </div>
 
                 <div style="margin-top: 1.5rem;">
-                    <a href="http://localhost:8001/docs" class="btn btn-primary" target="_blank">View Full API Documentation</a>
+                    <a href="#" onclick="window.open(API_BASE + '/docs', '_blank'); return false;" class="btn btn-primary">View Full API Documentation</a>
                 </div>
             </div>
         </div>
@@ -746,7 +746,12 @@
 
     <!-- JavaScript for real-time data -->
     <script>
-        const API_BASE = 'http://localhost:8001';
+        // Auto-detect environment: use localhost for development, deployed API for production
+        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:8001'
+            : 'https://lightos-dcim-api.onrender.com';  // Update this with your deployed API URL
+
+        console.log('DCIM Dashboard loaded. API Base:', API_BASE);
         let ws = null;
 
         // Update KPI cards

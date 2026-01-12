@@ -1,4 +1,4 @@
-# Netlify Configuration for LightOS Documentation & DCIM Dashboard
+# Netlify Configuration for LightOS DCIM Dashboard
 
 [build]
   # Publish directory
@@ -7,7 +7,13 @@
   # No build command needed for static site
   command = "echo 'Deploying LightOS DCIM Dashboard'"
 
-# Redirect rules for documentation
+# Redirect root to DCIM dashboard
+[[redirects]]
+  from = "/"
+  to = "/dcim.html"
+  status = 302
+
+# Redirect documentation paths
 [[redirects]]
   from = "/docs/*"
   to = "/guides/:splat"
