@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-LightOS DCIM API
-Data Center Infrastructure Management API with real-time telemetry
+LightOS DCIM Pro API - Enhanced
+Advanced DCIM with ISA-95, ML-based peak shaving, and autonomous AI optimization
 """
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
@@ -11,13 +11,13 @@ import asyncio
 import json
 import random
 from datetime import datetime, timedelta
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import uvicorn
 
 app = FastAPI(
-    title="LightOS DCIM API",
-    description="Data Center Infrastructure Management with AI-driven telemetry",
-    version="1.0.0"
+    title="LightOS DCIM Pro API",
+    description="AI-Driven Data Center Management with ISA-95 and ML-based optimization",
+    version="2.0.0"
 )
 
 # CORS middleware
@@ -31,11 +31,11 @@ app.add_middleware(
 
 
 # ============================================================================
-# DATA MODELS & SIMULATORS
+# ENHANCED DATA MODELS & SIMULATORS
 # ============================================================================
 
-class DCIMSimulator:
-    """Simulates realistic datacenter metrics"""
+class EnhancedDCIMSimulator:
+    """Enhanced DCIM simulator with advanced features"""
 
     def __init__(self):
         self.base_power = 150000  # 150kW base load
@@ -43,16 +43,456 @@ class DCIMSimulator:
         self.base_temp = 22.0  # Celsius
         self.time_start = datetime.now()
 
+        # Advanced feature states
+        self.predictive_cooling_active = True
+        self.dynamic_power_capping_active = True
+        self.carbon_aware_scheduling = True
+        self.digital_twin_active = True
+
+        # Peak shaving state
+        self.peak_events_prevented = 23
+        self.cost_savings_monthly = 1850.0
+
+        # Job orchestration state
+        self.low_priority_jobs = 12
+        self.jobs_per_hour = 1240
+        self.job_queue_depth = 3
+
+    def get_enhanced_kpi_summary(self) -> Dict[str, Any]:
+        """Get enhanced KPI summary with all new metrics"""
+        # Base metrics
+        clock_stability = 99.8 - random.uniform(0, 0.3)
+        throttle_events = random.randint(0, 2)
+
+        # AI-OEE calculation (more detailed)
+        availability = 0.998
+        performance = random.uniform(0.94, 0.98)
+        quality = random.uniform(0.96, 0.99)
+        ai_oee = availability * performance * quality
+
+        # MFU (Model FLOPS Utilization)
+        mfu = random.uniform(0.85, 0.92)
+
+        # PUE with industry comparison
+        pue = random.uniform(1.08, 1.12)
+        industry_avg_pue = 1.58
+
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "clock_stability_pct": clock_stability,
+            "throttle_events_count": throttle_events,
+            "thermal_headroom_c": random.uniform(20, 25),
+            "power_utilization_pct": random.uniform(88, 95),
+            "ai_oee_pct": ai_oee * 100,
+            "mfu_pct": mfu * 100,
+            "pue": pue,
+            "industry_avg_pue": industry_avg_pue,
+            "pue_improvement_pct": ((industry_avg_pue - pue) / industry_avg_pue) * 100,
+            "peak_shaving_savings_usd": random.uniform(12000, 18000),
+            "uptime_hours": (datetime.now() - self.time_start).total_seconds() / 3600,
+            "status": "optimal",
+            "alerts": []
+        }
+
+    def get_peak_shaving_status(self) -> Dict[str, Any]:
+        """Get ML-based peak shaving system status"""
+        current_time = datetime.now()
+        peak_time = current_time + timedelta(minutes=15)
+
+        current_load = random.uniform(380, 420)
+        predicted_peak = current_load * random.uniform(1.12, 1.18)
+
+        return {
+            "timestamp": current_time.isoformat(),
+            "step1_monitoring": {
+                "grid_power_kw": current_load,
+                "ess_soc_pct": random.uniform(65, 85),
+                "it_load_pdu_kw": current_load * 0.8,
+                "it_load_workload_usages": current_load * 0.75
+            },
+            "step2_ml_prediction": {
+                "predicted_peak_kw": predicted_peak,
+                "peak_time_forecast": peak_time.isoformat(),
+                "time_to_peak_minutes": 15,
+                "confidence_pct": random.uniform(92, 96),
+                "model_accuracy": 94.2,
+                "integrated_monitoring": True,
+                "machine_learning": "LSTM + Attention"
+            },
+            "step3_power_control": {
+                "ess_dc_power_kw": random.uniform(20, 40),
+                "pcs_status": random.choice(["Standby", "Charging", "Discharging"]),
+                "peak_reduction_pct": random.uniform(12, 18),
+                "time_to_charge_minutes": random.randint(45, 90),
+                "power_conversion_system": "Bidirectional DC/AC"
+            },
+            "step4_job_relocation": {
+                "low_priority_jobs_count": self.low_priority_jobs,
+                "job_queue_depth": self.job_queue_depth,
+                "power_freed_kw": random.uniform(7, 10),
+                "peak_time_detected": True,
+                "low_ess_battery": False,
+                "high_electricity_cost": random.uniform(0.12, 0.18),
+                "scheduler_decision_engine": "K8s + Slurm"
+            },
+            "step5_optimization": {
+                "batch_size_adjustment": "256→128",
+                "spikes_prevented_count": self.peak_events_prevented,
+                "cost_savings_monthly_usd": self.cost_savings_monthly,
+                "real_time_adjustment": True,
+                "prevent_power_spikes": True,
+                "large_model_optimization": "sLLM (Lightweight)",
+                "reduce_gpu_power": "Reduce compute speed, throttling"
+            },
+            "summary": {
+                "peak_shaving_active": True,
+                "total_savings_today_usd": random.uniform(150, 300),
+                "peaks_prevented_today": random.randint(2, 5),
+                "ess_cycles_today": random.randint(1, 3),
+                "carbon_reduced_kg": random.uniform(45, 75)
+            }
+        }
+
+    def get_advanced_features_status(self) -> Dict[str, Any]:
+        """Get status of all advanced AI-driven features"""
+        return {
+            "predictive_cooling": {
+                "active": self.predictive_cooling_active,
+                "energy_saved_pct": random.uniform(16, 20),
+                "accuracy_pct": random.uniform(94, 98),
+                "response_time_seconds": random.uniform(8, 12),
+                "pre_cooling_enabled": True,
+                "thermal_inertia_model": "Physics-based + ML",
+                "scheduled_workload_impact": "15 min ahead",
+                "description": "Pre-cooling based on schedule thermal inertia and workload predictions"
+            },
+            "workload_orchestration": {
+                "active": True,
+                "jobs_per_hour": self.jobs_per_hour + random.randint(-50, 50),
+                "efficiency_pct": random.uniform(92, 96),
+                "avg_queue_time_minutes": random.uniform(2, 3),
+                "topology_aware": True,
+                "power_thermal_constraints": True,
+                "scheduler_type": "Topology-aware with GPU affinity",
+                "description": "Topology-aware scheduling with power and thermal constraints"
+            },
+            "dynamic_power_capping": {
+                "active": self.dynamic_power_capping_active,
+                "capacity_gain_pct": random.uniform(10, 14),
+                "safety_margin_pct": 5,
+                "response_time_ms": random.uniform(45, 55),
+                "safe_oversubscription": True,
+                "real_time_control": True,
+                "power_conversion_control": "Active",
+                "description": "Safe oversubscription via real-time power conversion control"
+            },
+            "digital_twin": {
+                "active": self.digital_twin_active,
+                "accuracy_pct": random.uniform(97, 99),
+                "scenarios_per_day": random.randint(400, 500),
+                "prediction_window_minutes": 15,
+                "simulation_active": True,
+                "what_if_analysis": True,
+                "real_time_learning": True,
+                "description": "Real-time simulation and learning for what-if analysis"
+            },
+            "esg_carbon_tracking": {
+                "active": self.carbon_aware_scheduling,
+                "co2_reduced_pct": random.uniform(28, 32),
+                "green_hours_pct": random.uniform(65, 70),
+                "monthly_savings_usd": random.uniform(4000, 4500),
+                "carbon_aware_scheduling": True,
+                "low_carbon_hours_prioritized": True,
+                "grid_carbon_intensity_monitoring": True,
+                "description": "Carbon-aware scheduling to shift workloads to low-carbon hours"
+            },
+            "advanced_billing": {
+                "active": True,
+                "cost_per_token_usd": 0.002,
+                "spot_savings_pct": random.uniform(38, 42),
+                "accuracy_pct": 99.9,
+                "per_token_pricing": True,
+                "spot_pricing": True,
+                "real_time_cost_optimization": True,
+                "description": "Per-token, spot pricing with real-time cost optimization"
+            },
+            "sla_management": {
+                "active": True,
+                "sla_met_pct": random.uniform(99.93, 99.97),
+                "violations_count": 0,
+                "uptime_pct": random.uniform(99.96, 99.99),
+                "performance_based_guarantees": True,
+                "automated_tracking": True,
+                "real_time_monitoring": True,
+                "description": "Performance-based guarantees with automated tracking"
+            },
+            "capacity_planning": {
+                "active": True,
+                "utilization_pct": random.uniform(90, 94),
+                "forecast_accuracy_pct": random.uniform(93, 97),
+                "lead_time_days": 30,
+                "stranded_power_prevention": True,
+                "ml_demand_forecasting": True,
+                "capacity_optimization": True,
+                "description": "Preventing stranded power via ML-based demand forecasting"
+            }
+        }
+
+    def get_isa95_detailed(self) -> Dict[str, Any]:
+        """Get detailed ISA-95 5-layer architecture with features"""
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "layers": {
+                "m5_ai_orchestration": {
+                    "id": "M5",
+                    "name": "AI Orchestration & Optimization",
+                    "level": 5,
+                    "description": "Cross-layer AI for autonomous datacenter optimization",
+                    "features": {
+                        "autonomous_optimization": {
+                            "name": "Autonomous Optimization",
+                            "description": "AI for AI Ops: ML-driven workload and infrastructure control",
+                            "status": "active",
+                            "metrics": {
+                                "optimization_cycles_per_day": random.randint(800, 1200),
+                                "accuracy": random.uniform(94, 98),
+                                "response_time_ms": random.uniform(100, 200)
+                            }
+                        },
+                        "predictive_cooling": {
+                            "name": "Predictive Cooling",
+                            "description": "Pre-cooling based on schedule thermal inertia predictions",
+                            "status": "active",
+                            "metrics": {
+                                "energy_saved_pct": random.uniform(16, 20),
+                                "prediction_accuracy": random.uniform(94, 98),
+                                "lead_time_minutes": 15
+                            }
+                        },
+                        "dynamic_power_capping": {
+                            "name": "Dynamic Power Capping",
+                            "description": "Safe oversubscription via power conversion real-time control",
+                            "status": "active",
+                            "metrics": {
+                                "capacity_gain_pct": random.uniform(10, 14),
+                                "safety_margin_pct": 5,
+                                "response_time_ms": random.uniform(45, 55)
+                            }
+                        },
+                        "esg_carbon_aware": {
+                            "name": "ESG: Carbon-Aware Scheduling",
+                            "description": "Shift workloads to low-carbon grid hours",
+                            "status": "active",
+                            "metrics": {
+                                "co2_reduced_pct": random.uniform(28, 32),
+                                "green_hours_pct": random.uniform(65, 70),
+                                "cost_savings_usd": random.uniform(4000, 4500)
+                            }
+                        }
+                    }
+                },
+                "m4_business_planning": {
+                    "id": "M4",
+                    "name": "Business Planning & Logistics",
+                    "level": 4,
+                    "description": "Strategic planning and financial optimization",
+                    "features": {
+                        "advanced_billing": {
+                            "name": "Advanced Billing",
+                            "description": "Per-token, spot pricing for AI workloads",
+                            "status": "active",
+                            "metrics": {
+                                "tokens_processed_billions": random.uniform(1.2, 1.8),
+                                "cost_per_token": 0.002,
+                                "spot_savings_pct": random.uniform(38, 42)
+                            }
+                        },
+                        "sla_management": {
+                            "name": "SLA Management",
+                            "description": "Performance-based guarantees with automated tracking",
+                            "status": "active",
+                            "metrics": {
+                                "sla_met_pct": random.uniform(99.93, 99.97),
+                                "violations_count": 0,
+                                "uptime_pct": random.uniform(99.96, 99.99)
+                            }
+                        },
+                        "capacity_planning": {
+                            "name": "Capacity Planning",
+                            "description": "Preventing stranded power via demand forecasting",
+                            "status": "active",
+                            "metrics": {
+                                "utilization_pct": random.uniform(90, 94),
+                                "forecast_accuracy": random.uniform(93, 97),
+                                "lead_time_days": 30
+                            }
+                        },
+                        "roi_analysis": {
+                            "name": "ROI Analysis",
+                            "description": "Energy procurement & cost tracking optimization",
+                            "status": "active",
+                            "metrics": {
+                                "annual_savings_usd": random.uniform(180000, 220000),
+                                "roi_pct": random.uniform(25, 35),
+                                "payback_period_months": random.randint(8, 14)
+                            }
+                        }
+                    }
+                },
+                "m3_manufacturing_operations": {
+                    "id": "M3",
+                    "name": "Manufacturing Operations Management",
+                    "level": 3,
+                    "description": "Operational efficiency and orchestration",
+                    "features": {
+                        "operational_efficiency": {
+                            "name": "Operational Efficiency",
+                            "description": "Workload orchestration via topology-aware scheduling",
+                            "status": "active",
+                            "metrics": {
+                                "jobs_per_hour": random.randint(1200, 1300),
+                                "efficiency_pct": random.uniform(92, 96),
+                                "topology_awareness": True
+                            }
+                        },
+                        "ai_oee_tracking": {
+                            "name": "AI-OEE Tracking",
+                            "description": "Maximizing MFU & ETTF ratio",
+                            "status": "active",
+                            "metrics": {
+                                "mfu_pct": random.uniform(85, 92),
+                                "ettf_pct": random.uniform(88, 94),
+                                "ai_oee": random.uniform(0.92, 0.96)
+                            }
+                        },
+                        "asset_lifecycle": {
+                            "name": "Asset Lifecycle",
+                            "description": "Predictive maintenance scheduling optimization",
+                            "status": "active",
+                            "metrics": {
+                                "mtbf_hours": random.randint(8000, 12000),
+                                "maintenance_windows": random.randint(2, 4),
+                                "downtime_reduction_pct": random.uniform(40, 60)
+                            }
+                        },
+                        "resource_optimization": {
+                            "name": "Resource Optimization",
+                            "description": "Power/thermal-aware workload placement",
+                            "status": "active",
+                            "metrics": {
+                                "placement_efficiency": random.uniform(93, 97),
+                                "power_balance_score": random.uniform(0.85, 0.95),
+                                "thermal_hotspots": 0
+                            }
+                        }
+                    }
+                },
+                "m2_monitoring_supervision": {
+                    "id": "M2",
+                    "name": "Monitoring & Supervision",
+                    "level": 2,
+                    "description": "Holistic visibility and IT/OT convergence",
+                    "features": {
+                        "holistic_visibility": {
+                            "name": "Holistic Visibility",
+                            "description": "Single Pane of Glass: Integrated dashboards",
+                            "status": "active",
+                            "metrics": {
+                                "data_sources": 15,
+                                "refresh_rate_hz": 1,
+                                "dashboard_uptime_pct": 99.99
+                            }
+                        },
+                        "it_ot_convergence": {
+                            "name": "IT/OT Convergence",
+                            "description": "Correlating physical facility data with IT workload performance",
+                            "status": "active",
+                            "metrics": {
+                                "correlation_accuracy": random.uniform(94, 98),
+                                "data_integration_points": 28,
+                                "real_time_sync": True
+                            }
+                        },
+                        "deep_telemetry": {
+                            "name": "Deep Telemetry",
+                            "description": "DCGM (GPU), Packet Loss, thermal impact compute",
+                            "status": "active",
+                            "metrics": {
+                                "signals_monitored": 45,
+                                "sampling_rate_hz": 1,
+                                "data_retention_days": 90
+                            }
+                        },
+                        "real_time_alerting": {
+                            "name": "Real-time Alerting",
+                            "description": "Anomaly detection with automated response",
+                            "status": "active",
+                            "metrics": {
+                                "alerts_per_day": random.randint(5, 15),
+                                "false_positive_rate_pct": random.uniform(2, 5),
+                                "response_time_seconds": random.uniform(5, 15)
+                            }
+                        }
+                    }
+                },
+                "m1_sensing_manipulation": {
+                    "id": "M1",
+                    "name": "Sensing & Manipulation",
+                    "level": 1,
+                    "description": "Real-time interface and precision control",
+                    "features": {
+                        "real_time_interface": {
+                            "name": "Real-Time Interface",
+                            "description": "High-Frequency Telemetry: ms-level power data",
+                            "status": "active",
+                            "metrics": {
+                                "sampling_rate_khz": 1,
+                                "latency_ms": random.uniform(0.5, 2),
+                                "data_accuracy_pct": 99.99
+                            }
+                        },
+                        "precision_control": {
+                            "name": "Precision Control",
+                            "description": "Liquid cooling (flow/temp), PTP time sync",
+                            "status": "active",
+                            "metrics": {
+                                "flow_control_accuracy_pct": random.uniform(98, 99.5),
+                                "temp_control_precision_c": 0.5,
+                                "ptp_sync_accuracy_ns": random.randint(50, 150)
+                            }
+                        },
+                        "synchronization": {
+                            "name": "Synchronization",
+                            "description": "IEEE 1588v2 PTP for distributed coordination",
+                            "status": "active",
+                            "metrics": {
+                                "sync_accuracy_ns": random.randint(50, 150),
+                                "nodes_synchronized": 128,
+                                "sync_stability_pct": 99.99
+                            }
+                        },
+                        "abstraction": {
+                            "name": "Abstraction",
+                            "description": "Redfish, Modbus for hardware interaction",
+                            "status": "active",
+                            "metrics": {
+                                "protocols_supported": 5,
+                                "api_calls_per_second": random.randint(500, 1000),
+                                "compatibility_score": 100
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    # Keep existing methods
     def get_gpu_metrics(self, gpu_id: int = 0) -> Dict[str, Any]:
         """Get real-time GPU metrics"""
-        # Simulate realistic GPU behavior
         clock_base = 1410  # MHz
         clock_jitter = random.uniform(-5, 5)
-
         temp_base = 65 + random.uniform(-3, 3)
-        power_base = 350 + random.uniform(-20, 20)  # Watts
-
-        # Simulate occasional throttling (rare)
+        power_base = 350 + random.uniform(-20, 20)
         throttle_event = random.random() < 0.001
 
         return {
@@ -83,9 +523,6 @@ class DCIMSimulator:
             random.uniform(300, 400) for _ in range(self.num_gpus)
         )
 
-        avg_temp = self.base_temp + random.uniform(0, 2)
-
-        # Calculate AI-OEE (Overall Equipment Effectiveness)
         availability = 0.998
         performance = random.uniform(0.94, 0.98)
         quality = random.uniform(0.96, 0.99)
@@ -99,24 +536,22 @@ class DCIMSimulator:
             "pue": random.uniform(1.08, 1.12),
             "avg_gpu_temp_c": 65 + random.uniform(-2, 2),
             "avg_gpu_util_pct": random.uniform(93, 97),
-            "cooling_temp_c": avg_temp,
+            "cooling_temp_c": self.base_temp + random.uniform(0, 2),
             "cooling_flow_lpm": random.uniform(4500, 5000),
             "ai_oee": ai_oee,
-            "mfu_pct": random.uniform(0.85, 0.92),  # Model FLOPS Utilization
+            "mfu_pct": random.uniform(0.85, 0.92),
             "uptime_hours": (datetime.now() - self.time_start).total_seconds() / 3600
         }
 
     def get_power_metrics(self) -> Dict[str, Any]:
         """Get power distribution metrics"""
         hour = datetime.now().hour
-
-        # Simulate daily power pattern
-        if 9 <= hour <= 17:  # Peak hours
+        if 9 <= hour <= 17:
             load_factor = random.uniform(0.85, 0.95)
         else:
             load_factor = random.uniform(0.60, 0.75)
 
-        total_capacity = 500  # kW
+        total_capacity = 500
         current_load = total_capacity * load_factor
 
         return {
@@ -125,7 +560,7 @@ class DCIMSimulator:
             "current_load_kw": current_load,
             "load_factor_pct": load_factor * 100,
             "power_factor": random.uniform(0.95, 0.99),
-            "ess_soc_pct": random.uniform(65, 85),  # Energy Storage State of Charge
+            "ess_soc_pct": random.uniform(65, 85),
             "ess_charging": random.choice([True, False]),
             "peak_predicted_kw": current_load * 1.15,
             "peak_time_forecast": (datetime.now() + timedelta(hours=2)).isoformat(),
@@ -135,173 +570,70 @@ class DCIMSimulator:
             "frequency_hz": 60.0 + random.uniform(-0.1, 0.1)
         }
 
-    def get_thermal_metrics(self) -> Dict[str, Any]:
-        """Get cooling system metrics"""
-        supply_temp = self.base_temp + random.uniform(-1, 1)
-        return_temp = supply_temp + random.uniform(8, 12)
 
-        return {
-            "timestamp": datetime.now().isoformat(),
-            "supply_temp_c": supply_temp,
-            "return_temp_c": return_temp,
-            "delta_t_c": return_temp - supply_temp,
-            "flow_rate_lpm": random.uniform(4500, 5000),
-            "pressure_kpa": random.uniform(200, 250),
-            "chiller_load_pct": random.uniform(65, 80),
-            "cooling_capacity_kw": 600,
-            "cooling_load_kw": random.uniform(380, 480),
-            "wet_bulb_temp_c": 18 + random.uniform(-2, 2),
-            "ambient_temp_c": 28 + random.uniform(-3, 3),
-            "humidity_pct": random.uniform(40, 60)
-        }
-
-    def get_kpi_summary(self) -> Dict[str, Any]:
-        """Get KPI summary for dashboard"""
-        gpu_metrics = self.get_gpu_metrics()
-        cluster = self.get_cluster_metrics()
-        power = self.get_power_metrics()
-        thermal = self.get_thermal_metrics()
-
-        # Calculate key KPIs
-        clock_stability = 99.8 - random.uniform(0, 0.3)
-        throttle_events = random.randint(0, 2)
-        thermal_headroom = 90 - gpu_metrics["temperature_c"]
-        power_utilization = (gpu_metrics["power_draw_w"] / gpu_metrics["power_limit_w"]) * 100
-
-        # Peak shaving savings
-        peak_shaving_savings_monthly = random.uniform(12000, 18000)
-
-        return {
-            "timestamp": datetime.now().isoformat(),
-            "clock_stability_pct": clock_stability,
-            "throttle_events_count": throttle_events,
-            "thermal_headroom_c": thermal_headroom,
-            "power_utilization_pct": power_utilization,
-            "ai_oee_pct": cluster["ai_oee"] * 100,
-            "mfu_pct": cluster["mfu_pct"] * 100,
-            "peak_shaving_savings_usd": peak_shaving_savings_monthly,
-            "pue": cluster["pue"],
-            "uptime_hours": cluster["uptime_hours"],
-            "status": "optimal",
-            "alerts": []
-        }
-
-    def get_telemetry_signals(self) -> List[Dict[str, Any]]:
-        """Get telemetry signal definitions"""
-        return [
-            {
-                "signal": "GPU SM Clock",
-                "source": "DCGM",
-                "frequency": "1 Hz",
-                "primary_use": "Clock stability verification",
-                "unit": "MHz"
-            },
-            {
-                "signal": "GPU Temperature",
-                "source": "DCGM",
-                "frequency": "1 Hz",
-                "primary_use": "Thermal headroom monitoring",
-                "unit": "°C"
-            },
-            {
-                "signal": "GPU Power Draw",
-                "source": "DCGM",
-                "frequency": "1 Hz",
-                "primary_use": "Power utilization tracking",
-                "unit": "W"
-            },
-            {
-                "signal": "PDU Load",
-                "source": "Raritan PDU",
-                "frequency": "1 Hz",
-                "primary_use": "Peak prediction & shaving",
-                "unit": "kW"
-            },
-            {
-                "signal": "PDU Power Factor",
-                "source": "Raritan PDU",
-                "frequency": "1 Hz",
-                "primary_use": "Power quality monitoring",
-                "unit": "ratio"
-            },
-            {
-                "signal": "Cooling Supply Temp",
-                "source": "BMS",
-                "frequency": "0.1 Hz",
-                "primary_use": "Thermal control",
-                "unit": "°C"
-            },
-            {
-                "signal": "Cooling Flow Rate",
-                "source": "BMS",
-                "frequency": "0.1 Hz",
-                "primary_use": "Cooling capacity verification",
-                "unit": "LPM"
-            },
-            {
-                "signal": "ESS State of Charge",
-                "source": "Battery BMS",
-                "frequency": "0.1 Hz",
-                "primary_use": "Peak shaving readiness",
-                "unit": "%"
-            },
-            {
-                "signal": "ESS State of Health",
-                "source": "Battery BMS",
-                "frequency": "0.01 Hz",
-                "primary_use": "Battery lifecycle management",
-                "unit": "%"
-            },
-            {
-                "signal": "Job Queue Depth",
-                "source": "Slurm",
-                "frequency": "0.1 Hz",
-                "primary_use": "Workload relocation decisions",
-                "unit": "count"
-            }
-        ]
-
-
-# Global simulator instance
-simulator = DCIMSimulator()
+# Global enhanced simulator instance
+simulator = EnhancedDCIMSimulator()
 
 
 # ============================================================================
-# API ENDPOINTS
+# ENHANCED API ENDPOINTS
 # ============================================================================
 
 @app.get("/")
 async def root():
     """API root"""
     return {
-        "name": "LightOS DCIM API",
-        "version": "1.0.0",
+        "name": "LightOS DCIM Pro API",
+        "version": "2.0.0",
         "status": "operational",
+        "features": [
+            "ISA-95 5-Layer Architecture",
+            "ML-Based Peak Shaving",
+            "Predictive Cooling",
+            "Dynamic Power Capping",
+            "Carbon-Aware Scheduling",
+            "Digital Twin",
+            "Advanced Billing",
+            "SLA Management"
+        ],
         "endpoints": {
             "kpi": "/api/dcim/kpi",
             "gpu": "/api/dcim/gpu/{gpu_id}",
             "cluster": "/api/dcim/cluster",
             "power": "/api/dcim/power",
-            "thermal": "/api/dcim/thermal",
-            "telemetry": "/api/dcim/telemetry",
-            "websocket": "/ws/dcim"
+            "peak_shaving": "/api/dcim/peak-shaving",
+            "advanced_features": "/api/dcim/advanced-features",
+            "isa95": "/api/dcim/isa95",
+            "health": "/health",
+            "docs": "/docs"
         }
+    }
+
+
+@app.get("/health")
+async def health():
+    """Health check endpoint"""
+    return {
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "version": "2.0.0",
+        "uptime_seconds": (datetime.now() - simulator.time_start).total_seconds()
     }
 
 
 @app.get("/api/dcim/kpi")
 async def get_kpi():
-    """Get KPI summary"""
-    return simulator.get_kpi_summary()
+    """Get enhanced KPI summary"""
+    return simulator.get_enhanced_kpi_summary()
 
 
 @app.get("/api/dcim/gpu/{gpu_id}")
 async def get_gpu_metrics(gpu_id: int):
-    """Get metrics for specific GPU"""
+    """Get GPU-specific metrics"""
     if gpu_id < 0 or gpu_id >= simulator.num_gpus:
         return JSONResponse(
-            status_code=404,
-            content={"error": f"GPU {gpu_id} not found"}
+            status_code=400,
+            content={"error": f"GPU ID must be between 0 and {simulator.num_gpus - 1}"}
         )
     return simulator.get_gpu_metrics(gpu_id)
 
@@ -318,188 +650,44 @@ async def get_power_metrics():
     return simulator.get_power_metrics()
 
 
-@app.get("/api/dcim/thermal")
-async def get_thermal_metrics():
-    """Get cooling system metrics"""
-    return simulator.get_thermal_metrics()
+@app.get("/api/dcim/peak-shaving")
+async def get_peak_shaving_status():
+    """Get ML-based peak shaving system status"""
+    return simulator.get_peak_shaving_status()
 
 
-@app.get("/api/dcim/telemetry")
-async def get_telemetry_signals():
-    """Get telemetry signal definitions"""
-    return {
-        "signals": simulator.get_telemetry_signals()
-    }
+@app.get("/api/dcim/advanced-features")
+async def get_advanced_features():
+    """Get status of all advanced AI-driven features"""
+    return simulator.get_advanced_features_status()
 
 
 @app.get("/api/dcim/isa95")
-async def get_isa95_layers():
-    """Get ISA-95 layer breakdown"""
-    return {
-        "layers": [
-            {
-                "layer": "M1",
-                "name": "Sensing & Manipulation",
-                "isa95_level": "L0-L1",
-                "description": "Hardware sensors, actuators, and basic control",
-                "components": ["DCGM", "PDU sensors", "BMS", "Temperature probes"],
-                "data_frequency": "1-10 Hz"
-            },
-            {
-                "layer": "M2",
-                "name": "Monitoring & Supervision",
-                "isa95_level": "L2",
-                "description": "Real-time data aggregation and visualization",
-                "components": ["Prometheus", "Grafana", "Alert Manager"],
-                "data_frequency": "0.1-1 Hz"
-            },
-            {
-                "layer": "M3",
-                "name": "Manufacturing Operations Management",
-                "isa95_level": "L3",
-                "description": "Workload orchestration and resource management",
-                "components": ["Kubernetes", "Slurm", "Job Scheduler"],
-                "data_frequency": "0.01-0.1 Hz"
-            },
-            {
-                "layer": "M4",
-                "name": "Business Planning & Logistics",
-                "isa95_level": "L4",
-                "description": "Capacity planning, SLA management, billing",
-                "components": ["ERP", "CRM", "Billing System"],
-                "data_frequency": "Hourly to Daily"
-            },
-            {
-                "layer": "M5",
-                "name": "AI Orchestration & Optimization",
-                "isa95_level": "Cross-layer",
-                "description": "ML-driven predictive control and optimization",
-                "components": ["LightRail AI", "Peak Predictor", "Thermal Optimizer"],
-                "data_frequency": "Variable (event-driven)"
-            }
-        ]
-    }
+async def get_isa95_details():
+    """Get detailed ISA-95 5-layer architecture"""
+    return simulator.get_isa95_detailed()
 
 
-@app.get("/api/dcim/peak-shaving")
-async def get_peak_shaving_strategy():
-    """Get peak shaving strategy steps"""
-    return {
-        "strategy": [
-            {
-                "step": 1,
-                "name": "IT Load & ESS SoC Monitoring",
-                "description": "Continuous monitoring of IT power load and battery state",
-                "inputs": ["PDU load (kW)", "ESS SoC (%)", "ESS SoH (%)"],
-                "outputs": ["Real-time power profile"],
-                "frequency": "1 Hz"
-            },
-            {
-                "step": 2,
-                "name": "ML-based Peak Prediction",
-                "description": "Forecast power demand peaks 1-4 hours ahead",
-                "inputs": ["Historical load", "Job queue", "Time of day", "Weather"],
-                "outputs": ["Peak forecast (kW, time)"],
-                "frequency": "Every 5 minutes"
-            },
-            {
-                "step": 3,
-                "name": "Peak Shaving via PCS",
-                "description": "Charge/discharge battery to flatten peak",
-                "inputs": ["Peak forecast", "ESS SoC", "Tariff rates"],
-                "outputs": ["ESS charge/discharge commands"],
-                "frequency": "Real-time"
-            },
-            {
-                "step": 4,
-                "name": "Job Relocation",
-                "description": "Move non-critical jobs to off-peak hours",
-                "inputs": ["Job priority", "Deadline", "Peak forecast"],
-                "outputs": ["Rescheduled jobs"],
-                "frequency": "Event-driven"
-            },
-            {
-                "step": 5,
-                "name": "Parameter & Model Optimization",
-                "description": "Reduce power via smaller models or batch sizes",
-                "inputs": ["Training config", "Power budget", "Performance requirements"],
-                "outputs": ["Optimized hyperparameters"],
-                "frequency": "Per-job"
-            }
-        ],
-        "current_status": {
-            "active_strategies": ["PCS", "Job Relocation"],
-            "ess_mode": "standby",
-            "predicted_peak_kw": simulator.get_power_metrics()["peak_predicted_kw"],
-            "peak_time": simulator.get_power_metrics()["peak_time_forecast"],
-            "savings_today_usd": random.uniform(400, 600)
-        }
-    }
-
-
+# WebSocket for real-time streaming
 @app.websocket("/ws/dcim")
 async def websocket_endpoint(websocket: WebSocket):
-    """WebSocket for real-time telemetry streaming"""
+    """WebSocket endpoint for real-time telemetry"""
     await websocket.accept()
-
     try:
         while True:
-            # Send real-time data every second
             data = {
-                "type": "telemetry_update",
                 "timestamp": datetime.now().isoformat(),
-                "kpi": simulator.get_kpi_summary(),
-                "cluster": simulator.get_cluster_metrics(),
+                "kpi": simulator.get_enhanced_kpi_summary(),
                 "power": simulator.get_power_metrics(),
-                "thermal": simulator.get_thermal_metrics()
+                "peak_shaving": simulator.get_peak_shaving_status()
             }
-
-            await websocket.send_json(data)
-            await asyncio.sleep(1)
-
+            await websocket.send_text(json.dumps(data))
+            await asyncio.sleep(1)  # 1 Hz
     except WebSocketDisconnect:
-        print("Client disconnected")
+        pass
 
-
-# ============================================================================
-# HEALTH CHECK
-# ============================================================================
-
-@app.get("/health")
-async def health_check():
-    """Health check endpoint"""
-    return {
-        "status": "healthy",
-        "timestamp": datetime.now().isoformat(),
-        "simulator": "running",
-        "datacenter": "operational"
-    }
-
-
-# ============================================================================
-# MAIN
-# ============================================================================
 
 if __name__ == "__main__":
-    print("=" * 70)
-    print("LightOS DCIM API Server")
-    print("=" * 70)
-    print("Starting server on http://0.0.0.0:8001")
-    print()
-    print("Endpoints:")
-    print("  - Dashboard KPIs:    http://localhost:8001/api/dcim/kpi")
-    print("  - Cluster Metrics:   http://localhost:8001/api/dcim/cluster")
-    print("  - Power Metrics:     http://localhost:8001/api/dcim/power")
-    print("  - Thermal Metrics:   http://localhost:8001/api/dcim/thermal")
-    print("  - ISA-95 Layers:     http://localhost:8001/api/dcim/isa95")
-    print("  - Peak Shaving:      http://localhost:8001/api/dcim/peak-shaving")
-    print("  - WebSocket:         ws://localhost:8001/ws/dcim")
-    print("=" * 70)
-    print()
-
-    uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=8001,
-        log_level="info"
-    )
+    import os
+    port = int(os.getenv("PORT", 8001))
+    uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")
