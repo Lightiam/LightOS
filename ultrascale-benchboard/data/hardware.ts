@@ -1,0 +1,137 @@
+import { HardwareProfile } from './types';
+
+export const defaultHardwareProfiles: HardwareProfile[] = [
+  // NVIDIA GPUs
+  {
+    id: 'nvidia-a100-80gb',
+    name: 'NVIDIA A100 80GB',
+    type: 'gpu',
+    vendor: 'NVIDIA',
+    smCount: 108,
+    fp16Tflops: 312,
+    fp32Tflops: 19.5,
+    int8Tops: 624,
+    hbmBandwidthGBps: 2000,
+    vramSizeGB: 80,
+    interconnect: 'NVLink 3.0',
+    interconnectBandwidthGBps: 600,
+    costPerHour: 4.10,
+    frameworks: ['PyTorch', 'TensorFlow', 'JAX', 'Megatron-LM', 'DeepSpeed'],
+    notes: 'Most popular for large-scale training. Excellent balance of compute and memory.'
+  },
+  {
+    id: 'nvidia-h100-80gb',
+    name: 'NVIDIA H100 80GB',
+    type: 'gpu',
+    vendor: 'NVIDIA',
+    smCount: 132,
+    fp16Tflops: 989,
+    fp32Tflops: 67,
+    int8Tops: 1979,
+    hbmBandwidthGBps: 3350,
+    vramSizeGB: 80,
+    interconnect: 'NVLink 4.0',
+    interconnectBandwidthGBps: 900,
+    costPerHour: 8.00,
+    frameworks: ['PyTorch', 'TensorFlow', 'JAX', 'Megatron-LM', 'DeepSpeed', 'TensorRT-LLM'],
+    notes: 'Hopper architecture with Transformer Engine. 3x faster than A100 for LLM training.'
+  },
+  {
+    id: 'nvidia-v100-32gb',
+    name: 'NVIDIA V100 32GB',
+    type: 'gpu',
+    vendor: 'NVIDIA',
+    smCount: 80,
+    fp16Tflops: 125,
+    fp32Tflops: 15.7,
+    hbmBandwidthGBps: 900,
+    vramSizeGB: 32,
+    interconnect: 'NVLink 2.0',
+    interconnectBandwidthGBps: 300,
+    costPerHour: 2.48,
+    frameworks: ['PyTorch', 'TensorFlow', 'JAX'],
+    notes: 'Legacy but still widely available. Limited memory for large models.'
+  },
+
+  // Google TPUs
+  {
+    id: 'google-tpu-v4',
+    name: 'Google TPU v4',
+    type: 'tpu',
+    vendor: 'Google',
+    fp16Tflops: 275,
+    fp32Tflops: 137.5,
+    hbmBandwidthGBps: 1200,
+    vramSizeGB: 32,
+    interconnect: 'ICI (Inter-Chip Interconnect)',
+    interconnectBandwidthGBps: 460,
+    podSize: 4096,
+    costPerHour: 3.67,
+    frameworks: ['JAX', 'TensorFlow', 'PyTorch/XLA'],
+    notes: 'Excellent for large-scale JAX training. Strong pod-level interconnect.'
+  },
+  {
+    id: 'google-tpu-v5p',
+    name: 'Google TPU v5p',
+    type: 'tpu',
+    vendor: 'Google',
+    fp16Tflops: 459,
+    fp32Tflops: 229.5,
+    hbmBandwidthGBps: 2400,
+    vramSizeGB: 95,
+    interconnect: 'ICI 3.0',
+    interconnectBandwidthGBps: 4800,
+    podSize: 8192,
+    costPerHour: 6.40,
+    frameworks: ['JAX', 'TensorFlow', 'PyTorch/XLA', 'MaxText'],
+    notes: 'Latest TPU with massive interconnect bandwidth. Ideal for ultra-large models.'
+  },
+  {
+    id: 'google-tpu-v5e',
+    name: 'Google TPU v5e (Ironwood)',
+    type: 'tpu',
+    vendor: 'Google',
+    fp16Tflops: 197,
+    fp32Tflops: 98.5,
+    hbmBandwidthGBps: 820,
+    vramSizeGB: 16,
+    interconnect: 'ICI',
+    interconnectBandwidthGBps: 200,
+    podSize: 256,
+    costPerHour: 1.60,
+    frameworks: ['JAX', 'TensorFlow', 'PyTorch/XLA'],
+    notes: 'Cost-optimized TPU for smaller-scale training and inference.'
+  },
+
+  // AWS Trainium/Inferentia
+  {
+    id: 'aws-trainium',
+    name: 'AWS Trainium',
+    type: 'other',
+    vendor: 'AWS',
+    fp16Tflops: 190,
+    fp32Tflops: 47.5,
+    hbmBandwidthGBps: 820,
+    vramSizeGB: 32,
+    interconnect: 'EFA (Elastic Fabric Adapter)',
+    interconnectBandwidthGBps: 400,
+    costPerHour: 1.34,
+    frameworks: ['PyTorch', 'TensorFlow', 'Neuron SDK'],
+    notes: 'AWS custom chip for training. Good price/performance for PyTorch.'
+  },
+  {
+    id: 'aws-inferentia2',
+    name: 'AWS Inferentia2',
+    type: 'other',
+    vendor: 'AWS',
+    fp16Tflops: 190,
+    int8Tops: 380,
+    hbmBandwidthGBps: 384,
+    vramSizeGB: 32,
+    interconnect: 'EFA',
+    interconnectBandwidthGBps: 100,
+    costPerHour: 0.76,
+    frameworks: ['PyTorch', 'TensorFlow', 'Neuron SDK', 'TensorRT'],
+    notes: 'Optimized for inference. Low cost, high throughput for serving.'
+  }
+];
