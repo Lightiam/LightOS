@@ -1,0 +1,22 @@
+# Render.com deployment configuration for LightOS DCIM API
+# https://render.com/docs/yaml-spec
+
+services:
+  # DCIM API Web Service
+  - type: web
+    name: lightos-dcim-api
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: PYTHONUNBUFFERED
+        value: 1
+      - key: KAGGLE_API_TOKEN
+        sync: false  # Set this in Render dashboard
+    # Auto-deploy from this path
+    rootDir: dcim-api
