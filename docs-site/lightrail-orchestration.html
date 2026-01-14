@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LightRail AI - Workload Orchestration | LightOS</title>
+    <style>
+        :root {
+            /* LightRail Theme - Rail/Transit Inspired */
+            --rail-primary: #6366f1;
+            --rail-secondary: #8b5cf6;
+            --rail-accent: #06b6d4;
+            --rail-success: #10b981;
+            --rail-warning: #f59e0b;
+            --rail-danger: #ef4444;
+
+            /* Backgrounds */
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #0f172a;
+            --bg-tertiary: #1e293b;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+
+            /* Text */
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+
+            /* Borders */
+            --border-color: #334155;
+            --border-glow: rgba(99, 102, 241, 0.3);
+
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --gradient-rail: linear-gradient(90deg, #06b6d4 0%, #6366f1 50%, #8b5cf6 100%);
+            --gradient-card: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animated {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.3;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+            animation: bgPulse 20s ease-in-out infinite;
+        }
+
+        @keyframes bgPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.5; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .logo-text h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient-rail);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .stat-item {
+            text-align: right;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--rail-accent);
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            background: var(--bg-secondary);
+            padding: 0.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .tab:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Workflow Builder */
+        .workflow-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .workflow-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .btn-primary {
+            padding: 0.75rem 1.5rem;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Rail Track - Visual Workflow */
+        .rail-track {
+            background: var(--bg-secondary);
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rail-track::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-rail);
+            opacity: 0.3;
+            transform: translateY(-50%);
+        }
+
+        .workflow-stations {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .station {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .station-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            background: var(--bg-tertiary);
+            border: 3px solid var(--rail-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .station-icon:hover {
+            transform: scale(1.1);
+            border-color: var(--rail-accent);
+            box-shadow: 0 0 40px rgba(6, 182, 212, 0.5);
+        }
+
+        .station-icon.active {
+            background: var(--gradient-primary);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.8); }
+        }
+
+        .station-label {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .station-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Workload Cards Grid */
+        .workload-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .workload-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .workload-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-rail);
+        }
+
+        .workload-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-glow);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .workload-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .workload-info h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .workload-type {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-badge {
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-running {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--rail-success);
+            border: 1px solid var(--rail-success);
+        }
+
+        .status-queued {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--rail-warning);
+            border: 1px solid var(--rail-warning);
+        }
+
+        .status-completed {
+            background: rgba(6, 182, 212, 0.2);
+            color: var(--rail-accent);
+            border: 1px solid var(--rail-accent);
+        }
+
+        .workload-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .metric {
+            background: rgba(99, 102, 241, 0.05);
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--rail-primary);
+        }
+
+        .metric-unit {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-left: 0.25rem;
+        }
+
+        .workload-progress {
+            margin-top: 1rem;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar-container {
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--gradient-rail);
+            transition: width 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .workload-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 0.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-action:hover {
+            background: var(--bg-hover);
+            border-color: var(--rail-primary);
+            color: var(--text-primary);
+        }
+
+        /* GPU Resource Pool */
+        .resource-pool {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .resource-pool-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .resource-pool-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .gpu-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .gpu-card {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .gpu-card:hover {
+            border-color: var(--rail-primary);
+            transform: translateY(-2px);
+        }
+
+        .gpu-card.allocated {
+            border-color: var(--rail-success);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .gpu-card.available {
+            border-color: var(--rail-accent);
+        }
+
+        .gpu-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .gpu-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .gpu-status-dot.available {
+            background: var(--rail-success);
+            box-shadow: 0 0 10px var(--rail-success);
+        }
+
+        .gpu-status-dot.allocated {
+            background: var(--rail-warning);
+            box-shadow: 0 0 10px var(--rail-warning);
+        }
+
+        .gpu-specs {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .gpu-utilization {
+            margin-top: 0.75rem;
+        }
+
+        .util-bar {
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 0.25rem;
+        }
+
+        .util-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            transition: width 0.5s ease;
+        }
+
+        /* Orchestration Rules */
+        .rules-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .rule-item {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--rail-primary);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .rule-info h4 {
+            margin-bottom: 0.5rem;
+        }
+
+        .rule-condition {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-family: 'Courier New', monospace;
+        }
+
+        .rule-toggle {
+            width: 50px;
+            height: 26px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .rule-toggle.active {
+            background: var(--rail-primary);
+            border-color: var(--rail-primary);
+        }
+
+        .rule-toggle::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .rule-toggle.active::after {
+            transform: translateX(24px);
+        }
+
+        /* Analytics Dashboard */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .analytics-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .analytics-card h3 {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .analytics-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--gradient-rail);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .analytics-trend {
+            font-size: 0.875rem;
+            color: var(--rail-success);
+            margin-top: 0.5rem;
+        }
+
+        .analytics-trend.down {
+            color: var(--rail-danger);
+        }
+
+        /* Chart Placeholder */
+        .chart-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 1rem;
+            height: 200px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: var(--gradient-primary);
+            border-radius: 8px 8px 0 0;
+            animation: barGrow 1s ease-out;
+        }
+
+        @keyframes barGrow {
+            from { transform: scaleY(0); }
+            to { transform: scaleY(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+
+            .workflow-stations {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .workload-grid,
+            .gpu-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animated"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo">🚄</div>
+                <div class="logo-text">
+                    <h1>LightRail AI</h1>
+                    <p>Intelligent Workload Orchestration</p>
+                </div>
+            </div>
+
+            <div class="header-stats">
+                <div class="stat-item">
+                    <div class="stat-label">Active Jobs</div>
+                    <div class="stat-value">24</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">GPU Utilization</div>
+                    <div class="stat-value">87%</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Cost/Hour</div>
+                    <div class="stat-value">$42.50</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="tab active" onclick="switchTab('workflows')">
+                <span>🔄</span> Workflows
+            </button>
+            <button class="tab" onclick="switchTab('workloads')">
+                <span>📊</span> Active Workloads
+            </button>
+            <button class="tab" onclick="switchTab('resources')">
+                <span>🎮</span> GPU Pool
+            </button>
+            <button class="tab" onclick="switchTab('rules')">
+                <span>⚙️</span> Orchestration Rules
+            </button>
+            <button class="tab" onclick="switchTab('analytics')">
+                <span>📈</span> Analytics
+            </button>
+        </nav>
+
+        <!-- Tab Content: Workflows -->
+        <div id="workflows" class="tab-content active">
+            <div class="workflow-header">
+                <h2 class="workflow-title">Build Your AI Pipeline</h2>
+                <button class="btn-primary">
+                    <span>➕</span> New Workflow
+                </button>
+            </div>
+
+            <div class="rail-track">
+                <div class="workflow-stations">
+                    <div class="station">
+                        <div class="station-icon active">📥</div>
+                        <div class="station-label">Data Ingestion</div>
+                        <div class="station-desc">Load & Preprocess</div>
+                    </div>
+
+                    <div class="station">
+                        <div class="station-icon">🧠</div>
+                        <div class="station-label">Training</div>
+                        <div class="station-desc">Model Training</div>
+                    </div>
+
+                    <div class="station">
+                        <div class="station-icon">✅</div>
+                        <div class="station-label">Validation</div>
+                        <div class="station-desc">Test & Validate</div>
+                    </div>
+
+                    <div class="station">
+                        <div class="station-icon">🚀</div>
+                        <div class="station-label">Deployment</div>
+                        <div class="station-desc">Production Deploy</div>
+                    </div>
+
+                    <div class="station">
+                        <div class="station-icon">📊</div>
+                        <div class="station-label">Monitoring</div>
+                        <div class="station-desc">Performance Track</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.5rem;">Recent Workflows</h3>
+            <div class="workload-grid">
+                <div class="workload-card">
+                    <div class="workload-header">
+                        <div class="workload-info">
+                            <h3>LLaMA 70B Fine-tuning</h3>
+                            <div class="workload-type">Training Pipeline</div>
+                        </div>
+                        <span class="status-badge status-running">Running</span>
+                    </div>
+
+                    <div class="workload-metrics">
+                        <div class="metric">
+                            <div class="metric-label">GPUs Allocated</div>
+                            <div class="metric-value">8<span class="metric-unit">× H100</span></div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Runtime</div>
+                            <div class="metric-value">4.2<span class="metric-unit">hrs</span></div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Throughput</div>
+                            <div class="metric-value">2.4K<span class="metric-unit">tok/s</span></div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Cost</div>
+                            <div class="metric-value">$33.60<span class="metric-unit">/hr</span></div>
+                        </div>
+                    </div>
+
+                    <div class="workload-progress">
+                        <div class="progress-label">
+                            <span>Training Progress</span>
+                            <span>67%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: 67%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="workload-actions">
+                        <button class="btn-action">⏸️ Pause</button>
+                        <button class="btn-action">📊 Metrics</button>
+                        <button class="btn-action">⚙️ Configure</button>
+                    </div>
+                </div>
+
+                <div class="workload-card">
+                    <div class="workload-header">
+                        <div class="workload-info">
+                            <h3>Stable Diffusion XL</h3>
+                            <div class="workload-type">Inference Serving</div>
+                        </div>
+                        <span class="status-badge status-running">Running</span>
+                    </div>
+
+                    <div class="workload-metrics">
+                        <div class="metric">
+                            <div class="metric-label">GPUs Allocated</div>
+                            <div class="metric-value">4<span class="metric-unit">× A100</span></div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Runtime</div>
+                            <div class="metric-value">12.8<span class="metric-unit">hrs</span></div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Requests/min</div>
+                            <div class="metric-value">180<span class="metric-unit">req</span></div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Avg Latency</div>
+                            <div class="metric-value">1.2<span class="metric-unit">sec</span></div>
+                        </div>
+                    </div>
+
+                    <div class="workload-progress">
+                        <div class="progress-label">
+                            <span>Queue Depth</span>
+                            <span>12 requests</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: 24%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="workload-actions">
+                        <button class="btn-action">📈 Scale Up</button>
+                        <button class="btn-action">📊 Metrics</button>
+                        <button class="btn-action">⚙️ Configure</button>
+                    </div>
+                </div>
+
+                <div class="workload-card">
+                    <div class="workload-header">
+                        <div class="workload-info">
+                            <h3>Whisper-v3 Transcription</h3>
+                            <div class="workload-type">Batch Processing</div>
+                        </div>
+                        <span class="status-badge status-queued">Queued</span>
+                    </div>
+
+                    <div class="workload-metrics">
+                        <div class="metric">
+                            <div class="metric-label">GPUs Required</div>
+                            <div class="metric-value">2<span class="metric-unit">× RTX6000</span></div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Est. Runtime</div>
+                            <div class="metric-value">2.5<span class="metric-unit">hrs</span></div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Files</div>
+                            <div class="metric-value">340<span class="metric-unit">audio</span></div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Priority</div>
+                            <div class="metric-value">High</div>
+                        </div>
+                    </div>
+
+                    <div class="workload-progress">
+                        <div class="progress-label">
+                            <span>Queue Position</span>
+                            <span>#2</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="workload-actions">
+                        <button class="btn-action">⬆️ Prioritize</button>
+                        <button class="btn-action">❌ Cancel</button>
+                        <button class="btn-action">⚙️ Configure</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Active Workloads -->
+        <div id="workloads" class="tab-content">
+            <div class="workflow-header">
+                <h2 class="workflow-title">Active Workloads</h2>
+                <button class="btn-primary">
+                    <span>📋</span> View Queue
+                </button>
+            </div>
+
+            <div class="workload-grid">
+                <!-- Additional workload cards would go here -->
+                <div class="workload-card">
+                    <div class="workload-header">
+                        <div class="workload-info">
+                            <h3>GPT-4 Clone Training</h3>
+                            <div class="workload-type">Large Scale Training</div>
+                        </div>
+                        <span class="status-badge status-running">Running</span>
+                    </div>
+
+                    <div class="workload-metrics">
+                        <div class="metric">
+                            <div class="metric-label">GPU Cluster</div>
+                            <div class="metric-value">32<span class="metric-unit">× H100</span></div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Days Running</div>
+                            <div class="metric-value">8.3<span class="metric-unit">days</span></div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Tokens/sec</div>
+                            <div class="metric-value">52K<span class="metric-unit">tok/s</span></div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Total Cost</div>
+                            <div class="metric-value">$6,384<span class="metric-unit"></span></div>
+                        </div>
+                    </div>
+
+                    <div class="workload-progress">
+                        <div class="progress-label">
+                            <span>Epoch 24 of 100</span>
+                            <span>24%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: 24%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workload-card">
+                    <div class="workload-header">
+                        <div class="workload-info">
+                            <h3>Mixtral 8x7B Inference</h3>
+                            <div class="workload-type">MoE Serving</div>
+                        </div>
+                        <span class="status-badge status-running">Running</span>
+                    </div>
+
+                    <div class="workload-metrics">
+                        <div class="metric">
+                            <div class="metric-label">GPUs</div>
+                            <div class="metric-value">8<span class="metric-unit">× A100</span></div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Uptime</div>
+                            <div class="metric-value">36<span class="metric-unit">hrs</span></div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Throughput</div>
+                            <div class="metric-value">4.2K<span class="metric-unit">tok/s</span></div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Active Users</div>
+                            <div class="metric-value">142<span class="metric-unit"></span></div>
+                        </div>
+                    </div>
+
+                    <div class="workload-progress">
+                        <div class="progress-label">
+                            <span>Request Queue</span>
+                            <span>8 pending</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: 16%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: GPU Pool -->
+        <div id="resources" class="tab-content">
+            <div class="resource-pool">
+                <div class="resource-pool-header">
+                    <h2 class="resource-pool-title">GPU Resource Pool</h2>
+                    <button class="btn-primary">
+                        <span>➕</span> Add GPUs
+                    </button>
+                </div>
+
+                <div class="gpu-cards">
+                    <div class="gpu-card allocated">
+                        <div class="gpu-name">
+                            <span class="gpu-status-dot allocated"></span>
+                            H100-001
+                        </div>
+                        <div class="gpu-specs">80GB VRAM • 989 TFLOPS</div>
+                        <div class="gpu-specs">Allocated to: LLaMA 70B</div>
+                        <div class="gpu-utilization">
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Utilization: 89%</div>
+                            <div class="util-bar">
+                                <div class="util-fill" style="width: 89%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gpu-card allocated">
+                        <div class="gpu-name">
+                            <span class="gpu-status-dot allocated"></span>
+                            H100-002
+                        </div>
+                        <div class="gpu-specs">80GB VRAM • 989 TFLOPS</div>
+                        <div class="gpu-specs">Allocated to: LLaMA 70B</div>
+                        <div class="gpu-utilization">
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Utilization: 91%</div>
+                            <div class="util-bar">
+                                <div class="util-fill" style="width: 91%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gpu-card available">
+                        <div class="gpu-name">
+                            <span class="gpu-status-dot available"></span>
+                            A100-001
+                        </div>
+                        <div class="gpu-specs">80GB VRAM • 312 TFLOPS</div>
+                        <div class="gpu-specs">Status: Available</div>
+                        <div class="gpu-utilization">
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Utilization: 0%</div>
+                            <div class="util-bar">
+                                <div class="util-fill" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gpu-card allocated">
+                        <div class="gpu-name">
+                            <span class="gpu-status-dot allocated"></span>
+                            A100-002
+                        </div>
+                        <div class="gpu-specs">80GB VRAM • 312 TFLOPS</div>
+                        <div class="gpu-specs">Allocated to: Stable Diffusion</div>
+                        <div class="gpu-utilization">
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Utilization: 76%</div>
+                            <div class="util-bar">
+                                <div class="util-fill" style="width: 76%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gpu-card allocated">
+                        <div class="gpu-name">
+                            <span class="gpu-status-dot allocated"></span>
+                            RTX6000-001
+                        </div>
+                        <div class="gpu-specs">48GB VRAM • 149 TFLOPS</div>
+                        <div class="gpu-specs">Allocated to: Inference Pool</div>
+                        <div class="gpu-utilization">
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Utilization: 62%</div>
+                            <div class="util-bar">
+                                <div class="util-fill" style="width: 62%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gpu-card available">
+                        <div class="gpu-name">
+                            <span class="gpu-status-dot available"></span>
+                            RTX6000-002
+                        </div>
+                        <div class="gpu-specs">48GB VRAM • 149 TFLOPS</div>
+                        <div class="gpu-specs">Status: Available</div>
+                        <div class="gpu-utilization">
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Utilization: 0%</div>
+                            <div class="util-bar">
+                                <div class="util-fill" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Orchestration Rules -->
+        <div id="rules" class="tab-content">
+            <div class="workflow-header">
+                <h2 class="workflow-title">Orchestration Rules</h2>
+                <button class="btn-primary">
+                    <span>➕</span> New Rule
+                </button>
+            </div>
+
+            <div class="rules-section">
+                <div class="rule-item">
+                    <div class="rule-info">
+                        <h4>Auto-Scale on Queue Depth</h4>
+                        <div class="rule-condition">IF queue_depth > 10 THEN scale_up(gpu_count=2)</div>
+                    </div>
+                    <div class="rule-toggle active"></div>
+                </div>
+
+                <div class="rule-item">
+                    <div class="rule-info">
+                        <h4>Cost Optimization</h4>
+                        <div class="rule-condition">IF utilization < 30% FOR 1hr THEN migrate_to_spot_instance()</div>
+                    </div>
+                    <div class="rule-toggle active"></div>
+                </div>
+
+                <div class="rule-item">
+                    <div class="rule-info">
+                        <h4>Preemptive Checkpointing</h4>
+                        <div class="rule-condition">IF spot_interruption_warning THEN save_checkpoint() AND migrate()</div>
+                    </div>
+                    <div class="rule-toggle active"></div>
+                </div>
+
+                <div class="rule-item">
+                    <div class="rule-info">
+                        <h4>Priority-Based Scheduling</h4>
+                        <div class="rule-condition">PRIORITIZE jobs WHERE priority='high' AND deadline < 24hrs</div>
+                    </div>
+                    <div class="rule-toggle active"></div>
+                </div>
+
+                <div class="rule-item">
+                    <div class="rule-info">
+                        <h4>GPU Health Monitoring</h4>
+                        <div class="rule-condition">IF gpu_temp > 85°C OR memory_errors > 0 THEN evacuate_workload()</div>
+                    </div>
+                    <div class="rule-toggle active"></div>
+                </div>
+
+                <div class="rule-item">
+                    <div class="rule-info">
+                        <h4>Smart Batching</h4>
+                        <div class="rule-condition">BATCH similar_jobs WHERE model_type='inference' GROUP_BY model_name</div>
+                    </div>
+                    <div class="rule-toggle"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Analytics -->
+        <div id="analytics" class="tab-content">
+            <div class="workflow-header">
+                <h2 class="workflow-title">Performance Analytics</h2>
+                <button class="btn-primary">
+                    <span>📥</span> Export Report
+                </button>
+            </div>
+
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <h3>Total Compute Hours</h3>
+                    <div class="analytics-value">1,284</div>
+                    <div class="analytics-trend">↑ 12% from last week</div>
+                </div>
+
+                <div class="analytics-card">
+                    <h3>Average GPU Utilization</h3>
+                    <div class="analytics-value">87%</div>
+                    <div class="analytics-trend">↑ 5% from last week</div>
+                </div>
+
+                <div class="analytics-card">
+                    <h3>Cost Savings (Auto-Optimization)</h3>
+                    <div class="analytics-value">$2,340</div>
+                    <div class="analytics-trend">↑ 23% from last week</div>
+                </div>
+
+                <div class="analytics-card">
+                    <h3>Jobs Completed</h3>
+                    <div class="analytics-value">156</div>
+                    <div class="analytics-trend">↑ 8% from last week</div>
+                </div>
+
+                <div class="analytics-card">
+                    <h3>Average Job Duration</h3>
+                    <div class="analytics-value">4.2hrs</div>
+                    <div class="analytics-trend down">↓ 15% from last week</div>
+                </div>
+
+                <div class="analytics-card">
+                    <h3>Total Workload Cost</h3>
+                    <div class="analytics-value">$8,430</div>
+                    <div class="analytics-trend">↑ 18% from last week</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-bars">
+                    <div class="chart-bar" style="height: 60%;"></div>
+                    <div class="chart-bar" style="height: 75%;"></div>
+                    <div class="chart-bar" style="height: 45%;"></div>
+                    <div class="chart-bar" style="height: 90%;"></div>
+                    <div class="chart-bar" style="height: 70%;"></div>
+                    <div class="chart-bar" style="height: 85%;"></div>
+                    <div class="chart-bar" style="height: 95%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked tab
+            event.target.closest('.tab').classList.add('active');
+        }
+
+        // Toggle rule switches
+        document.querySelectorAll('.rule-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+        });
+
+        // Simulate real-time updates
+        setInterval(() => {
+            // Update random metrics
+            const randomUtil = Math.floor(Math.random() * 30) + 70;
+            document.querySelector('.stat-value:nth-of-type(2)').textContent = randomUtil + '%';
+        }, 5000);
+    </script>
+</body>
+</html>
