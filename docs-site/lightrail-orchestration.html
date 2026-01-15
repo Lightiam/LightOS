@@ -6,34 +6,35 @@
     <title>LightRail AI - Workload Orchestration | LightOS</title>
     <style>
         :root {
-            /* LightRail Theme - Rail/Transit Inspired */
-            --rail-primary: #6366f1;
-            --rail-secondary: #8b5cf6;
-            --rail-accent: #06b6d4;
-            --rail-success: #10b981;
-            --rail-warning: #f59e0b;
-            --rail-danger: #ef4444;
+            /* LightRail.ink Theme - Photonic Computing */
+            --rail-primary: #00ff41;        /* Neon green - primary brand */
+            --rail-secondary: #00cc33;      /* Darker green */
+            --rail-accent: #00ffff;         /* Cyan accent */
+            --rail-success: #00ff41;        /* Neon green */
+            --rail-warning: #ffaa00;        /* Amber */
+            --rail-danger: #ff3366;         /* Red */
 
-            /* Backgrounds */
-            --bg-primary: #0a0e1a;
-            --bg-secondary: #0f172a;
-            --bg-tertiary: #1e293b;
-            --bg-card: #1e293b;
-            --bg-hover: #334155;
+            /* Backgrounds - Dark teal theme */
+            --bg-primary: #0a1f1f;          /* Dark teal/cyan */
+            --bg-secondary: #0d2626;        /* Slightly lighter teal */
+            --bg-tertiary: #102d2d;         /* Teal card background */
+            --bg-card: #0f2828;             /* Card background */
+            --bg-hover: #143636;            /* Hover state */
 
             /* Text */
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --text-muted: #64748b;
+            --text-primary: #ffffff;        /* Pure white */
+            --text-secondary: #e0e0e0;      /* Light gray */
+            --text-muted: #8899aa;          /* Muted gray */
 
             /* Borders */
-            --border-color: #334155;
-            --border-glow: rgba(99, 102, 241, 0.3);
+            --border-color: #1a4040;        /* Dark teal border */
+            --border-glow: rgba(0, 255, 65, 0.4); /* Neon green glow */
 
             /* Gradients */
-            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            --gradient-rail: linear-gradient(90deg, #06b6d4 0%, #6366f1 50%, #8b5cf6 100%);
-            --gradient-card: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            --gradient-primary: linear-gradient(135deg, #00ff41 0%, #00cc33 100%);
+            --gradient-rail: linear-gradient(90deg, #00ffff 0%, #00ff41 50%, #00cc33 100%);
+            --gradient-card: linear-gradient(135deg, rgba(0, 255, 65, 0.05) 0%, rgba(0, 255, 255, 0.05) 100%);
+            --gradient-bg: radial-gradient(circle at 50% 50%, rgba(0, 255, 65, 0.1) 0%, transparent 70%);
         }
 
         * {
@@ -50,7 +51,7 @@
             overflow-x: hidden;
         }
 
-        /* Animated Background */
+        /* Animated Background - Photonic Circuit Pattern */
         .bg-animated {
             position: fixed;
             top: 0;
@@ -58,17 +59,36 @@
             width: 100%;
             height: 100%;
             z-index: 0;
-            opacity: 0.3;
+            opacity: 0.4;
             background:
-                radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 40% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
-            animation: bgPulse 20s ease-in-out infinite;
+                radial-gradient(circle at 20% 50%, rgba(0, 255, 65, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(0, 204, 51, 0.12) 0%, transparent 50%),
+                radial-gradient(circle 2px at 10% 30%, rgba(0, 255, 65, 0.3), transparent),
+                radial-gradient(circle 3px at 90% 60%, rgba(0, 255, 255, 0.2), transparent),
+                radial-gradient(circle 2px at 50% 80%, rgba(0, 255, 65, 0.25), transparent),
+                radial-gradient(circle 2px at 70% 20%, rgba(0, 204, 51, 0.2), transparent);
+            animation: bgPulse 15s ease-in-out infinite;
+        }
+
+        /* Circuit board pattern overlay */
+        .bg-animated::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.5;
         }
 
         @keyframes bgPulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.5; }
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.6; }
         }
 
         .container {
@@ -98,22 +118,45 @@
         .logo {
             width: 50px;
             height: 50px;
-            background: var(--gradient-primary);
-            border-radius: 12px;
+            background: var(--rail-primary);
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
-            box-shadow: 0 0 30px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 0 25px rgba(0, 255, 65, 0.5), 0 0 50px rgba(0, 255, 65, 0.2);
+            border: 2px solid rgba(0, 255, 65, 0.3);
+            position: relative;
+        }
+
+        /* Chip icon pattern */
+        .logo::before {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 60%;
+            border: 2px solid var(--bg-primary);
+            border-radius: 3px;
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            width: 30%;
+            height: 30%;
+            background: var(--bg-primary);
+            border-radius: 2px;
         }
 
         .logo-text h1 {
             font-size: 2rem;
             font-weight: 700;
-            background: var(--gradient-rail);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--text-primary);
+        }
+
+        .logo-text h1 span {
+            color: var(--rail-primary);
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
         }
 
         .logo-text p {
@@ -140,7 +183,8 @@
         .stat-value {
             font-size: 1.5rem;
             font-weight: 700;
-            color: var(--rail-accent);
+            color: var(--rail-primary);
+            text-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
         }
 
         /* Navigation Tabs */
@@ -177,9 +221,10 @@
         }
 
         .tab.active {
-            background: var(--gradient-primary);
-            color: white;
-            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+            background: var(--rail-primary);
+            color: var(--bg-primary);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4), 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-weight: 700;
         }
 
         /* Tab Content */
@@ -212,21 +257,26 @@
 
         .btn-primary {
             padding: 0.75rem 1.5rem;
-            background: var(--gradient-primary);
+            background: var(--rail-primary);
             border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
+            border-radius: 25px;
+            color: var(--bg-primary);
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4), 0 4px 15px rgba(0, 0, 0, 0.3);
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.05em;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.6), 0 8px 25px rgba(0, 0, 0, 0.4);
+            background: #00ff55;
         }
 
         /* Rail Track - Visual Workflow */
@@ -279,23 +329,31 @@
             font-size: 2rem;
             transition: all 0.3s ease;
             cursor: pointer;
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
         }
 
         .station-icon:hover {
             transform: scale(1.1);
             border-color: var(--rail-accent);
-            box-shadow: 0 0 40px rgba(6, 182, 212, 0.5);
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.5);
         }
 
         .station-icon.active {
-            background: var(--gradient-primary);
+            background: var(--rail-primary);
+            border-color: var(--rail-primary);
             animation: pulse 2s ease-in-out infinite;
+            color: var(--bg-primary);
         }
 
         @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
-            50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.8); }
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(0, 255, 65, 0.8), 0 0 60px rgba(0, 255, 65, 0.4);
+                transform: scale(1.05);
+            }
         }
 
         .station-label {
@@ -333,8 +391,9 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
-            background: var(--gradient-rail);
+            height: 3px;
+            background: linear-gradient(90deg, var(--rail-accent) 0%, var(--rail-primary) 50%, var(--rail-secondary) 100%);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
         }
 
         .workload-card:hover {
@@ -371,21 +430,24 @@
         }
 
         .status-running {
-            background: rgba(16, 185, 129, 0.2);
+            background: rgba(0, 255, 65, 0.15);
             color: var(--rail-success);
             border: 1px solid var(--rail-success);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
         }
 
         .status-queued {
-            background: rgba(245, 158, 11, 0.2);
+            background: rgba(255, 170, 0, 0.15);
             color: var(--rail-warning);
             border: 1px solid var(--rail-warning);
+            box-shadow: 0 0 10px rgba(255, 170, 0, 0.2);
         }
 
         .status-completed {
-            background: rgba(6, 182, 212, 0.2);
+            background: rgba(0, 255, 255, 0.15);
             color: var(--rail-accent);
             border: 1px solid var(--rail-accent);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
         }
 
         .workload-metrics {
@@ -396,10 +458,10 @@
         }
 
         .metric {
-            background: rgba(99, 102, 241, 0.05);
+            background: rgba(0, 255, 65, 0.03);
             padding: 0.75rem;
             border-radius: 8px;
-            border: 1px solid rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(0, 255, 65, 0.15);
         }
 
         .metric-label {
@@ -412,6 +474,7 @@
             font-size: 1.25rem;
             font-weight: 700;
             color: var(--rail-primary);
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
         }
 
         .metric-unit {
@@ -528,12 +591,14 @@
         }
 
         .gpu-card.allocated {
-            border-color: var(--rail-success);
-            background: rgba(16, 185, 129, 0.05);
+            border-color: var(--rail-warning);
+            background: rgba(255, 170, 0, 0.05);
         }
 
         .gpu-card.available {
-            border-color: var(--rail-accent);
+            border-color: var(--rail-primary);
+            background: rgba(0, 255, 65, 0.03);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
         }
 
         .gpu-name {
@@ -552,12 +617,18 @@
 
         .gpu-status-dot.available {
             background: var(--rail-success);
-            box-shadow: 0 0 10px var(--rail-success);
+            box-shadow: 0 0 10px var(--rail-success), 0 0 20px rgba(0, 255, 65, 0.3);
+            animation: pulseGlow 2s ease-in-out infinite;
         }
 
         .gpu-status-dot.allocated {
             background: var(--rail-warning);
             box-shadow: 0 0 10px var(--rail-warning);
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 10px var(--rail-success), 0 0 20px rgba(0, 255, 65, 0.3); }
+            50% { box-shadow: 0 0 15px var(--rail-success), 0 0 30px rgba(0, 255, 65, 0.5); }
         }
 
         .gpu-specs {
@@ -580,8 +651,9 @@
 
         .util-fill {
             height: 100%;
-            background: var(--gradient-primary);
+            background: linear-gradient(90deg, var(--rail-secondary) 0%, var(--rail-primary) 100%);
             transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
         }
 
         /* Orchestration Rules */
@@ -627,6 +699,7 @@
         .rule-toggle.active {
             background: var(--rail-primary);
             border-color: var(--rail-primary);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.4);
         }
 
         .rule-toggle::after {
@@ -671,16 +744,15 @@
         .analytics-value {
             font-size: 2.5rem;
             font-weight: 700;
-            background: var(--gradient-rail);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--rail-primary);
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
         }
 
         .analytics-trend {
             font-size: 0.875rem;
-            color: var(--rail-success);
+            color: var(--rail-primary);
             margin-top: 0.5rem;
+            font-weight: 600;
         }
 
         .analytics-trend.down {
@@ -710,14 +782,36 @@
 
         .chart-bar {
             flex: 1;
-            background: var(--gradient-primary);
+            background: linear-gradient(180deg, var(--rail-primary) 0%, var(--rail-secondary) 100%);
             border-radius: 8px 8px 0 0;
             animation: barGrow 1s ease-out;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
         }
 
         @keyframes barGrow {
             from { transform: scaleY(0); }
             to { transform: scaleY(1); }
+        }
+
+        /* Badge Pill */
+        .badge-pill {
+            display: inline-block;
+            padding: 0.5rem 1.25rem;
+            background: var(--rail-primary);
+            color: var(--bg-primary);
+            border-radius: 25px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+            animation: badgePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 65, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(0, 255, 65, 0.6); }
         }
 
         /* Responsive */
@@ -751,9 +845,9 @@
         <!-- Header -->
         <header class="header">
             <div class="logo-section">
-                <div class="logo">🚄</div>
+                <div class="logo"></div>
                 <div class="logo-text">
-                    <h1>LightRail AI</h1>
+                    <h1>LightRail <span>AI</span></h1>
                     <p>Intelligent Workload Orchestration</p>
                 </div>
             </div>
@@ -795,6 +889,10 @@
 
         <!-- Tab Content: Workflows -->
         <div id="workflows" class="tab-content active">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <span class="badge-pill">Photonic Computing Infrastructure</span>
+            </div>
+
             <div class="workflow-header">
                 <h2 class="workflow-title">Build Your AI Pipeline</h2>
                 <button class="btn-primary">
