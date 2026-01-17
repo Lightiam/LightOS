@@ -3,25 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LightOS Documentation</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Quick Start - LightOS Documentation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; max-width: 900px; margin: 0 auto; padding: 2rem; line-height: 1.6; }
-        h1 { color: #3b82f6; margin-bottom: 1rem; }
-        .back-link { display: inline-block; margin-bottom: 2rem; color: #3b82f6; text-decoration: none; }
-        .back-link:hover { text-decoration: underline; }
+        :root { --primary: #3b82f6; --secondary: #10b981; --text: #1e293b; --bg: #ffffff; --bg-secondary: #f8fafc; --border: #e2e8f0; }
+        [data-theme="dark"] { --text: #f1f5f9; --bg: #0f172a; --bg-secondary: #1e293b; --border: #334155; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+        .header { background: var(--bg); border-bottom: 1px solid var(--border); padding: 1rem 2rem; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 0.5rem; font-size: 1.5rem; font-weight: 700; color: var(--primary); text-decoration: none; }
+        .theme-toggle { background: none; border: 1px solid var(--border); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; font-size: 1.25rem; }
+        .content { max-width: 900px; margin: 0 auto; padding: 3rem 2rem; }
+        h1 { font-size: 2.5rem; margin-bottom: 1rem; background: linear-gradient(135deg, var(--primary), #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h2 { font-size: 1.875rem; margin: 2rem 0 1rem; }
+        h3 { font-size: 1.5rem; margin: 1.5rem 0 0.75rem; }
+        code { font-family: 'JetBrains Mono', monospace; background: #1e293b; color: #e2e8f0; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.875rem; }
+        pre { background: #1e293b; border-radius: 12px; padding: 1.5rem; overflow-x: auto; margin: 1.5rem 0; }
+        pre code { background: none; padding: 0; }
+        .card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; }
+        .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: var(--primary); color: white; text-decoration: none; border-radius: 8px; font-weight: 500; margin: 0.5rem 0.5rem 0.5rem 0; }
+        .btn:hover { background: #2563eb; transform: translateY(-2px); }
+        .back-link { display: inline-block; margin-bottom: 2rem; color: var(--primary); text-decoration: none; }
+        ul { margin-left: 1.5rem; }
+        li { margin-bottom: 0.5rem; }
     </style>
 </head>
 <body>
-    <a href="../docs.html" class="back-link">← Back to Documentation</a>
-    <h1>Documentation Coming Soon</h1>
-    <p>This page is under construction. Please check back soon or visit the <a href="../docs.html">documentation index</a>.</p>
-    <p>In the meantime, explore:</p>
-    <ul>
-        <li><a href="installation.html">Installation Guide</a></li>
-        <li><a href="../dcim.html">DCIM Dashboard</a></li>
-        <li><a href="https://github.com/Lightiam/LightOS">GitHub Repository</a></li>
-    </ul>
+    <header class="header">
+        <a href="../index.html" class="logo"><span style="font-size: 2rem;">⚡</span><span>LightOS</span></a>
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+    </header>
+
+    <div class="content">
+        <a href="../docs.html" class="back-link">← Back to Documentation</a>
+
+        <h1>🚀 Quick Start</h1>
+        <p style="font-size: 1.125rem; color: #64748b; margin-bottom: 3rem;">Get up and running with LightOS in 5 minutes.</p>
+
+        <h2>Step 1: Install LightOS</h2>
+        <pre><code class="language-bash"># Clone repository
+cd ~
+git clone https://lightos.repo/LightOS.git
+cd LightOS
+
+# Run installer (5-10 minutes)
+sudo ./simple-deploy.sh
+
+# Verify installation
+lightos --version</code></pre>
+
+        <h2>Step 2: Launch Interactive UI</h2>
+        <pre><code class="language-bash">lightos</code></pre>
+
+        <div class="card">
+            <p><strong>Interactive Menu Options:</strong></p>
+            <ul>
+                <li>Quick Fine-tune with Unsloth (⚡ 2-5x faster)</li>
+                <li>Start GLM-4 or Qwen2.5-Coder agents</li>
+                <li>Check hardware capabilities</li>
+                <li>View DCIM dashboard</li>
+            </ul>
+        </div>
+
+        <h2>Step 3: Generate Code with AI</h2>
+        <pre><code class="language-bash"># Generate code
+lightos-code qwen generate "FastAPI REST API with JWT auth"
+
+# Explain code
+lightos-code glm4 explain mycode.py
+
+# Fix bugs
+lightos-code qwen fix broken.py</code></pre>
+
+        <h2>Step 4: Fine-Tune a Model</h2>
+        <pre><code class="language-bash"># Quick fine-tune (30 minutes)
+lightos-train train llama-3.1-8b alpaca
+
+# With custom dataset
+lightos-train train llama-3.1-8b my_dataset.json --max-steps 200</code></pre>
+
+        <h2>Common Commands</h2>
+        <div class="card">
+            <pre><code class="language-bash"># Interactive launcher
+lightos
+
+# Training
+lightos-train
+lightos-train list
+lightos-train train <model> <dataset>
+
+# Coding agents
+lightos-code qwen generate "prompt"
+lightos-code glm4 explain file.py
+lightos-code qwen fix file.py
+
+# Check GPU
+nvidia-smi</code></pre>
+        </div>
+
+        <h2>Performance Tips</h2>
+
+        <h3>For Limited Memory (8GB VRAM)</h3>
+        <pre><code class="language-bash"># Use smaller models
+lightos-code qwen generate "code" --model-size 1.5b
+
+# Enable 4-bit quantization
+lightos-train train llama-3.1-8b alpaca --4bit</code></pre>
+
+        <h3>For Maximum Speed</h3>
+        <pre><code class="language-bash"># Use Flash Attention
+lightos-train train llama-3.1-8b alpaca --flash-attention
+
+# Reduce sequence length
+lightos-train train llama-3.1-8b alpaca --max-seq-length 1024</code></pre>
+
+        <h2>Next Steps</h2>
+        <div style="margin: 2rem 0;">
+            <a href="installation.html" class="btn" style="background: var(--secondary);"><span>📥</span>Full Installation Guide</a>
+            <a href="fine-tuning.html" class="btn"><span>🎯</span>Fine-Tuning Guide</a>
+            <a href="../dcim.html" class="btn"><span>📊</span>DCIM Dashboard</a>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            document.querySelector('.theme-toggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+        const saved = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', saved);
+        document.querySelector('.theme-toggle').textContent = saved === 'dark' ? '☀️' : '🌙';
+    </script>
 </body>
 </html>
