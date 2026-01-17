@@ -6,13 +6,16 @@ Advanced DCIM with ISA-95, ML-based peak shaving, and autonomous AI optimization
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 import asyncio
 import json
 import random
 from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional
 import uvicorn
+import os
+from pathlib import Path
 
 app = FastAPI(
     title="LightOS DCIM Pro API",
@@ -576,6 +579,90 @@ simulator = EnhancedDCIMSimulator()
 
 
 # ============================================================================
+# UI DATA ENDPOINTS
+# ============================================================================
+
+# Mock data for UI
+PROVIDERS = [
+    {"id": "1", "name": "LightRail DC-SJ", "type": "On-Prem", "totalGpus": 1240, "totalTpus": 512, "utilization": 84.5, "hourlyCost": 1240.50, "sla": 99.99, "region": "US-West"},
+    {"id": "2", "name": "AWS-US-West-2", "type": "Cloud", "totalGpus": 5200, "totalTpus": 0, "utilization": 62.1, "hourlyCost": 4850.20, "sla": 99.95, "region": "US-West"},
+    {"id": "3", "name": "GCP-Europe-1", "type": "Cloud", "totalGpus": 800, "totalTpus": 2048, "utilization": 71.8, "hourlyCost": 2100.80, "sla": 99.9, "region": "EU-North"},
+]
+
+JOBS = [
+    {"id": "J-101", "name": "LLM-Pretrain-A", "tenant": "NeuroScale AI", "status": "RUNNING", "resources": "8x H100", "provider": "LightRail DC-SJ", "startTime": "2h ago", "cost": 420.50, "progress": 45, "kwhPerJob": 120},
+    {"id": "J-102", "name": "Vision-Distill-01", "tenant": "SightCorp", "status": "QUEUED", "resources": "4x TPU v5e", "provider": "GCP-Europe-1", "startTime": "-", "cost": 0, "progress": 0},
+    {"id": "J-103", "name": "Inference-Fleet-X", "tenant": "AutoBot", "status": "RUNNING", "resources": "16x A100", "provider": "AWS-US-West-2", "startTime": "12h ago", "cost": 1240.80, "progress": 88, "kwhPerJob": 450},
+]
+
+SITES = [
+    {"id": "S-1", "name": "SJ-Alpha-01", "region": "San Jose, CA", "pue": 1.12, "racks": 48, "utilization": 86, "totalPowerCapacity": 2.5},
+    {"id": "S-2", "name": "EU-Central-02", "region": "Frankfurt, DE", "pue": 1.24, "racks": 32, "utilization": 64, "totalPowerCapacity": 1.8},
+]
+
+RACKS = [
+    {"id": "R-01", "name": "Rack-01", "pue": 1.08, "nodeCount": 12, "status": "OK", "powerLimit": 40, "powerActual": 32.4, "inletTemp": 22, "outletTemp": 34},
+    {"id": "R-02", "name": "Rack-02", "pue": 1.15, "nodeCount": 10, "status": "OK", "powerLimit": 40, "powerActual": 38.1, "inletTemp": 24, "outletTemp": 38},
+    {"id": "R-03", "name": "Rack-03", "pue": 1.21, "nodeCount": 12, "status": "WARNING", "powerLimit": 40, "powerActual": 39.8, "inletTemp": 28, "outletTemp": 44},
+]
+
+HCI_NODES = [
+    {"id": f"HCI-{i+1}", "name": f"Converged-Node-0{i+1}", "computeUtil": 60 + random.uniform(0, 30), "storageUtil": 40 + random.uniform(0, 50),
+     "throughput": f"{(100 + random.uniform(0, 200)):.1f} GB/s", "latency": f"{(0.1 + random.uniform(0, 0.2)):.2f}ms",
+     "redundancyStatus": "DEGRADED" if i == 7 else "ACTIVE", "tenantId": "T-01" if i < 4 else "T-02"}
+    for i in range(8)
+]
+
+TENANT_ISOLATION = [
+    {"id": "T-01", "name": "OpenAI-Research", "resourceShare": 45, "noisyNeighborScore": 4, "securityAlignment": "COMPLIANT"},
+    {"id": "T-02", "name": "Enterprise-Core", "resourceShare": 30, "noisyNeighborScore": 12, "securityAlignment": "COMPLIANT"},
+    {"id": "T-03", "name": "Edge-Inference-Labs", "resourceShare": 25, "noisyNeighborScore": 2, "securityAlignment": "COMPLIANT"},
+]
+
+MOCK_NODES = [
+    {"id": f"N-{i+1}", "name": f"Rack-01-Node-{i+1}", "rackId": "R-01", "type": "NVIDIA H100" if i % 2 == 0 else "Google TPU v5e",
+     "power": random.uniform(0.5, 3.0), "temp": random.uniform(40, 60), "utilization": random.uniform(0, 100),
+     "health": "OK" if random.random() > 0.1 else "WARNING", "throttlingLoss": random.uniform(0, 15) if random.random() > 0.8 else 0}
+    for i in range(12)
+]
+
+@app.get("/api/providers")
+async def get_providers():
+    """Get infrastructure providers"""
+    return PROVIDERS
+
+@app.get("/api/jobs")
+async def get_jobs():
+    """Get workload jobs"""
+    return JOBS
+
+@app.get("/api/sites")
+async def get_sites():
+    """Get datacenter sites"""
+    return SITES
+
+@app.get("/api/racks")
+async def get_racks():
+    """Get rack information"""
+    return RACKS
+
+@app.get("/api/nodes")
+async def get_nodes():
+    """Get node metrics"""
+    return MOCK_NODES
+
+@app.get("/api/hci-nodes")
+async def get_hci_nodes():
+    """Get HCI nodes"""
+    return HCI_NODES
+
+@app.get("/api/tenant-isolation")
+async def get_tenant_isolation():
+    """Get tenant isolation info"""
+    return TENANT_ISOLATION
+
+
+# ============================================================================
 # ENHANCED API ENDPOINTS
 # ============================================================================
 
@@ -685,6 +772,29 @@ async def websocket_endpoint(websocket: WebSocket):
             await asyncio.sleep(1)  # 1 Hz
     except WebSocketDisconnect:
         pass
+
+
+# ============================================================================
+# STATIC FILE SERVING
+# ============================================================================
+
+# Mount static files if the build directory exists
+STATIC_DIR = Path(__file__).parent.parent / "web-ui" / "dist"
+if STATIC_DIR.exists():
+    app.mount("/assets", StaticFiles(directory=str(STATIC_DIR / "assets")), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        """Serve the SPA for all non-API routes"""
+        # Skip API routes
+        if full_path.startswith("api/") or full_path.startswith("ws/") or full_path == "health" or full_path == "docs" or full_path == "openapi.json":
+            return JSONResponse({"error": "Not found"}, status_code=404)
+
+        # Serve index.html for SPA routes
+        index_file = STATIC_DIR / "index.html"
+        if index_file.exists():
+            return FileResponse(index_file)
+        return JSONResponse({"error": "Frontend not built. Run: cd web-ui && npm run build"}, status_code=404)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  lightos:
+    build:
+      context: ../..
+      dockerfile: deployment/vps/Dockerfile
+    container_name: lightos-dcim
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    environment:
+      - PORT=8001
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ../../logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - lightos-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: lightos-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/lightos.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../../web-ui/dist:/opt/lightos/web-ui/dist:ro
+      - ./ssl:/etc/letsencrypt:ro
+      - nginx-logs:/var/log/nginx
+    depends_on:
+      - lightos
+    networks:
+      - lightos-network
+
+networks:
+  lightos-network:
+    driver: bridge
+
+volumes:
+  nginx-logs:

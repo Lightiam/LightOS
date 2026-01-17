@@ -1,0 +1,27 @@
+
+{
+  "name": "lightos-aurora-demo",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "lucide-react": "^0.284.0",
+    "recharts": "^2.8.0",
+    "framer-motion": "^10.16.4",
+    "react-router-dom": "^6.16.0",
+    "clsx": "^2.0.0",
+    "tailwind-merge": "^1.14.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "vite": "^4.4.0",
+    "typescript": "^5.0.0"
+  }
+}

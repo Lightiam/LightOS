@@ -1,0 +1,32 @@
+[Unit]
+Description=LightOS DCIM API Service
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=lightos
+Group=lightos
+WorkingDirectory=/opt/lightos/dcim-api
+Environment="PATH=/opt/lightos/venv/bin"
+Environment="PORT=8001"
+ExecStart=/opt/lightos/venv/bin/python /opt/lightos/dcim-api/main.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=lightos
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/lightos/logs
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+[Install]
+WantedBy=multi-user.target
