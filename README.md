@@ -472,6 +472,6 @@ LightOS integrates best-in-class open source projects:
 
 ---
 
-**LightOS - Train Faster. Code Smarter. Build Better.**
+**LightOS - Train Faster. Code Smarter. Build Better. Better Inference **
 
-*Powered by Unsloth, GLM-4, Qwen2.5-Coder, and the open source community*
+*Open source community*
