@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LightOS Documentation - AI-Powered Operating System</title>
+    <meta name="description" content="Complete documentation for LightOS - the platform-agnostic AI inference and training operating system.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #10b981;
+            --accent: #8b5cf6;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --bg: #ffffff;
+            --bg-secondary: #f8fafc;
+            --border: #e2e8f0;
+        }
+
+        [data-theme="dark"] {
+            --text: #f1f5f9;
+            --text-light: #94a3b8;
+            --bg: #0f172a;
+            --bg-secondary: #1e293b;
+            --border: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-secondary);
+            border-color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 6rem 2rem;
+            background: linear-gradient(135deg, var(--bg) 0%, var(--bg-secondary) 100%);
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-light);
+            max-width: 800px;
+            margin: 0 auto 3rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.125rem;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        /* Content Section */
+        .content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-light);
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .doc-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .doc-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .doc-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .doc-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-description {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .card-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .card-link {
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .card-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Feature Highlights */
+        .features {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg) 100%);
+            padding: 4rem 2rem;
+            margin: 4rem 0;
+            border-radius: 24px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature {
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-text {
+            color: var(--text-light);
+        }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 1.125rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.25rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo">
+                <span style="font-size: 2rem;">⚡</span>
+                <span>LightOS</span>
+            </a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="docs.html">Docs</a></li>
+                    <li><a href="guides/installation.html">Install</a></li>
+                    <li><a href="guides/quickstart.html">Quick Start</a></li>
+                    <li><a href="dcim.html">Dashboard</a></li>
+                    <li><a href="https://github.com/Lightiam/LightOS">GitHub</a></li>
+                </ul>
+            </nav>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1 class="hero-title">LightOS Documentation</h1>
+        <p class="hero-subtitle">
+            Complete guides, API references, and examples for the platform-agnostic AI inference and training operating system
+        </p>
+        <div class="hero-buttons">
+            <a href="guides/quickstart.html" class="btn">
+                <span>🚀</span>
+                <span>Quick Start (5 min)</span>
+            </a>
+            <a href="guides/installation.html" class="btn btn-secondary">
+                <span>📥</span>
+                <span>Installation Guide</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <div class="content">
+        <div class="stats">
+            <div>
+                <div class="stat-value">92%</div>
+                <div class="stat-label">Model FLOPS Utilization</div>
+            </div>
+            <div>
+                <div class="stat-value">-18%</div>
+                <div class="stat-label">Power Consumption</div>
+            </div>
+            <div>
+                <div class="stat-value">+10.7%</div>
+                <div class="stat-label">Throughput Improvement</div>
+            </div>
+            <div>
+                <div class="stat-value">-32%</div>
+                <div class="stat-label">Latency Reduction (P99)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Getting Started -->
+    <section class="content">
+        <h2 class="section-title">Getting Started</h2>
+        <p class="section-subtitle">Choose your path to get up and running with LightOS</p>
+
+        <div class="cards-grid">
+            <a href="guides/quickstart.html" class="doc-card">
+                <div class="card-icon">🚀</div>
+                <div class="card-title">Quick Start</div>
+                <div class="card-description">
+                    Get LightOS running in 5 minutes. Perfect for beginners and quick prototyping.
+                </div>
+                <div class="card-links">
+                    <span class="card-link">Start now →</span>
+                </div>
+            </a>
+
+            <a href="guides/installation.html" class="doc-card">
+                <div class="card-icon">📥</div>
+                <div class="card-title">Installation</div>
+                <div class="card-description">
+                    Complete installation guide for all platforms: Ubuntu, Docker, VirtualBox, and edge devices.
+                </div>
+                <div class="card-links">
+                    <span class="card-link">View guide →</span>
+                </div>
+            </a>
+
+            <a href="guides/first-model.html" class="doc-card">
+                <div class="card-icon">🎯</div>
+                <div class="card-title">Train Your First Model</div>
+                <div class="card-description">
+                    Step-by-step tutorial to fine-tune your first LLM in under 30 minutes.
+                </div>
+                <div class="card-links">
+                    <span class="card-link">Start training →</span>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Main Guides -->
+    <section class="content">
+        <h2 class="section-title">Guides & Tutorials</h2>
+        <p class="section-subtitle">In-depth guides for advanced features</p>
+
+        <div class="cards-grid">
+            <a href="guides/fine-tuning.html" class="doc-card">
+                <div class="card-icon">⚙️</div>
+                <div class="card-title">Fine-Tuning Guide</div>
+                <div class="card-description">
+                    Master LLM fine-tuning with Unsloth: 2-5x faster training, 70% less memory.
+                </div>
+            </a>
+
+            <a href="guides/coding-agents.html" class="doc-card">
+                <div class="card-icon">🤖</div>
+                <div class="card-title">Coding Agents</div>
+                <div class="card-description">
+                    Generate, explain, and fix code with GLM-4 and Qwen2.5-Coder AI agents.
+                </div>
+            </a>
+
+            <a href="guides/inference-subsystem.html" class="doc-card">
+                <div class="card-icon">⚡</div>
+                <div class="card-title">Inference Subsystem</div>
+                <div class="card-description">
+                    High-performance C++23 inference runtime with thermal-aware scheduling.
+                </div>
+            </a>
+
+            <a href="dcim.html" class="doc-card">
+                <div class="card-icon">📊</div>
+                <div class="card-title">DCIM Monitoring</div>
+                <div class="card-description">
+                    Real-time data center infrastructure management with AI-OEE and predictive cooling.
+                </div>
+            </a>
+
+            <a href="guides/docker-deployment.html" class="doc-card">
+                <div class="card-icon">🐳</div>
+                <div class="card-title">Docker Deployment</div>
+                <div class="card-description">
+                    Containerized deployment with GPU support and persistent volumes.
+                </div>
+            </a>
+
+            <a href="guides/kubernetes.html" class="doc-card">
+                <div class="card-icon">☸️</div>
+                <div class="card-title">Kubernetes</div>
+                <div class="card-description">
+                    Production-grade K8s deployment with DaemonSet, gRPC, and eBPF integration.
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- API Reference -->
+    <section class="content">
+        <h2 class="section-title">API Reference</h2>
+        <p class="section-subtitle">Complete API documentation for all languages</p>
+
+        <div class="cards-grid">
+            <a href="api/python-api.html" class="doc-card">
+                <div class="card-icon">🐍</div>
+                <div class="card-title">Python API</div>
+                <div class="card-description">
+                    High-level Python API for training, inference, and agent orchestration.
+                </div>
+            </a>
+
+            <a href="api/cpp-api.html" class="doc-card">
+                <div class="card-icon">⚙️</div>
+                <div class="card-title">C++ API</div>
+                <div class="card-description">
+                    Low-level C++23 API for platform-agnostic device abstraction and scheduling.
+                </div>
+            </a>
+
+            <a href="api/rest-api.html" class="doc-card">
+                <div class="card-icon">🌐</div>
+                <div class="card-title">REST API</div>
+                <div class="card-description">
+                    HTTP/gRPC API for remote job submission and telemetry streaming.
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features">
+        <h2 class="section-title">Key Features</h2>
+        <div class="features-grid">
+            <div class="feature">
+                <div class="feature-icon">🔧</div>
+                <div class="feature-title">Platform-Agnostic</div>
+                <div class="feature-text">Runs on NVIDIA, AMD, Intel GPUs and future Photonic NPUs</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🌡️</div>
+                <div class="feature-title">Thermal-Aware</div>
+                <div class="feature-text">Predictive cooling reduces temperature by 15% and throttling by 94%</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">High Performance</div>
+                <div class="feature-text">92% MFU with tile-based execution and compute/transfer overlap</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">☸️</div>
+                <div class="feature-title">Kubernetes Native</div>
+                <div class="feature-text">Deploy as DaemonSet with gRPC and eBPF transparent interception</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources -->
+    <section class="content">
+        <h2 class="section-title">Resources</h2>
+
+        <div class="cards-grid">
+            <a href="guides/examples.html" class="doc-card">
+                <div class="card-icon">📚</div>
+                <div class="card-title">Examples</div>
+                <div class="card-description">
+                    Runnable examples for common use cases: chatbots, code generation, RAG systems.
+                </div>
+            </a>
+
+            <a href="guides/troubleshooting.html" class="doc-card">
+                <div class="card-icon">🔧</div>
+                <div class="card-title">Troubleshooting</div>
+                <div class="card-description">
+                    Common issues and solutions for installation, GPU detection, and performance.
+                </div>
+            </a>
+
+            <a href="guides/faq.html" class="doc-card">
+                <div class="card-icon">❓</div>
+                <div class="card-title">FAQ</div>
+                <div class="card-description">
+                    Frequently asked questions about LightOS features and capabilities.
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div>
+                <div class="footer-section-title">Documentation</div>
+                <ul class="footer-links">
+                    <li><a href="guides/quickstart.html">Quick Start</a></li>
+                    <li><a href="guides/installation.html">Installation</a></li>
+                    <li><a href="guides/fine-tuning.html">Fine-Tuning</a></li>
+                    <li><a href="guides/inference-subsystem.html">Inference</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-section-title">Deployment</div>
+                <ul class="footer-links">
+                    <li><a href="guides/docker-deployment.html">Docker</a></li>
+                    <li><a href="guides/kubernetes.html">Kubernetes</a></li>
+                    <li><a href="guides/aws-marketplace.html">AWS</a></li>
+                    <li><a href="guides/edge-deployment.html">Edge</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-section-title">API Reference</div>
+                <ul class="footer-links">
+                    <li><a href="api/python-api.html">Python</a></li>
+                    <li><a href="api/cpp-api.html">C++</a></li>
+                    <li><a href="api/rest-api.html">REST</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-section-title">Community</div>
+                <ul class="footer-links">
+                    <li><a href="https://github.com/Lightiam/LightOS">GitHub</a></li>
+                    <li><a href="https://github.com/Lightiam/LightOS/discussions">Discussions</a></li>
+                    <li><a href="https://github.com/Lightiam/LightOS/issues">Issues</a></li>
+                    <li><a href="dcim.html">Dashboard</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            document.querySelector('.theme-toggle').textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.querySelector('.theme-toggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    </script>
+</body>
+</html>

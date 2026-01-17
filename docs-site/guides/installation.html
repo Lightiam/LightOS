@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LightOS Documentation - Installation Guide</title>
+    <meta name="description" content="Complete installation guide for LightOS - the AI-powered operating system for neural compute workloads.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Prism.js for syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #10b981;
+            --accent: #8b5cf6;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --bg: #ffffff;
+            --bg-secondary: #f8fafc;
+            --border: #e2e8f0;
+            --code-bg: #1e293b;
+            --sidebar-width: 280px;
+            --header-height: 64px;
+        }
+
+        [data-theme="dark"] {
+            --text: #f1f5f9;
+            --text-light: #94a3b8;
+            --bg: #0f172a;
+            --bg-secondary: #1e293b;
+            --border: #334155;
+            --code-bg: #0f172a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-secondary);
+            border-color: var(--primary);
+        }
+
+        .github-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .github-link:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--bg);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-light);
+            padding: 0 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-link {
+            display: block;
+            padding: 0.5rem 1.5rem;
+            color: var(--text);
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-link:hover {
+            background: var(--bg-secondary);
+            color: var(--primary);
+        }
+
+        .sidebar-link.active {
+            background: var(--bg-secondary);
+            color: var(--primary);
+            border-left-color: var(--primary);
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 3rem;
+            max-width: 900px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+
+        .breadcrumb a {
+            color: var(--text-light);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary);
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-description {
+            font-size: 1.125rem;
+            color: var(--text-light);
+            margin-bottom: 3rem;
+        }
+
+        h2 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+        }
+
+        h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--code-bg);
+            color: #e2e8f0;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: var(--code-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        [data-theme="dark"] .alert-info {
+            background: #1e3a8a;
+            color: #93c5fd;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        [data-theme="dark"] .alert-success {
+            background: #064e3b;
+            color: #6ee7b7;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+
+        [data-theme="dark"] .alert-warning {
+            background: #78350f;
+            color: #fcd34d;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+            transform: translateY(-2px);
+        }
+
+        .next-steps {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .next-steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .next-step-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.3s;
+        }
+
+        .next-step-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .next-step-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .next-step-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .next-step-desc {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        /* Mobile menu button */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+
+        @media (max-width: 1024px) {
+            .mobile-menu-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+            <a href="../index.html" class="logo">
+                <span class="logo-icon">⚡</span>
+                <span>LightOS</span>
+            </a>
+        </div>
+        <div class="header-actions">
+            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+            <a href="https://github.com/Lightiam/LightOS" class="github-link">
+                <span>GitHub</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-title">Getting Started</div>
+            <ul class="sidebar-nav">
+                <li><a href="quickstart.html" class="sidebar-link">Quick Start</a></li>
+                <li><a href="installation.html" class="sidebar-link active">Installation</a></li>
+                <li><a href="first-model.html" class="sidebar-link">Train Your First Model</a></li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">Guides</div>
+            <ul class="sidebar-nav">
+                <li><a href="fine-tuning.html" class="sidebar-link">Fine-Tuning Guide</a></li>
+                <li><a href="coding-agents.html" class="sidebar-link">Coding Agents</a></li>
+                <li><a href="inference-subsystem.html" class="sidebar-link">Inference Subsystem</a></li>
+                <li><a href="dcim-monitoring.html" class="sidebar-link">DCIM Monitoring</a></li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">Deployment</div>
+            <ul class="sidebar-nav">
+                <li><a href="docker-deployment.html" class="sidebar-link">Docker</a></li>
+                <li><a href="kubernetes.html" class="sidebar-link">Kubernetes</a></li>
+                <li><a href="aws-marketplace.html" class="sidebar-link">AWS Marketplace</a></li>
+                <li><a href="edge-deployment.html" class="sidebar-link">Edge Devices</a></li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">API Reference</div>
+            <ul class="sidebar-nav">
+                <li><a href="../api/python-api.html" class="sidebar-link">Python API</a></li>
+                <li><a href="../api/cpp-api.html" class="sidebar-link">C++ API</a></li>
+                <li><a href="../api/rest-api.html" class="sidebar-link">REST API</a></li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">Resources</div>
+            <ul class="sidebar-nav">
+                <li><a href="examples.html" class="sidebar-link">Examples</a></li>
+                <li><a href="troubleshooting.html" class="sidebar-link">Troubleshooting</a></li>
+                <li><a href="faq.html" class="sidebar-link">FAQ</a></li>
+                <li><a href="../dcim.html" class="sidebar-link">DCIM Dashboard</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="breadcrumb">
+            <a href="../index.html">Home</a>
+            <span>→</span>
+            <a href="quickstart.html">Getting Started</a>
+            <span>→</span>
+            <span>Installation</span>
+        </div>
+
+        <h1 class="page-title">Installation Guide</h1>
+        <p class="page-description">Get LightOS running on your system in minutes. Choose the installation method that best fits your environment.</p>
+
+        <h2>System Requirements</h2>
+
+        <div class="grid">
+            <div class="card">
+                <div class="card-title">💻 Minimum</div>
+                <ul>
+                    <li><strong>OS:</strong> Ubuntu 22.04+, Windows 10/11 (WSL2), macOS</li>
+                    <li><strong>RAM:</strong> 8GB system RAM</li>
+                    <li><strong>Storage:</strong> 20GB free space</li>
+                    <li><strong>GPU:</strong> Optional (CPU mode available)</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-title">✨ Recommended</div>
+                <ul>
+                    <li><strong>OS:</strong> Ubuntu 22.04 LTS</li>
+                    <li><strong>RAM:</strong> 16GB+ system RAM</li>
+                    <li><strong>Storage:</strong> 100GB SSD</li>
+                    <li><strong>GPU:</strong> NVIDIA GPU with 6GB+ VRAM (RTX 3060+)</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🚀 Optimal</div>
+                <ul>
+                    <li><strong>OS:</strong> Ubuntu 22.04 LTS</li>
+                    <li><strong>RAM:</strong> 32GB+ system RAM</li>
+                    <li><strong>Storage:</strong> 500GB NVMe SSD</li>
+                    <li><strong>GPU:</strong> RTX 3090/4090/5090 (24GB+ VRAM)</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>Installation Methods</h2>
+
+        <h3>Method 1: Simple Install (Recommended)</h3>
+        <p>For Ubuntu, WSL2, or any Linux distribution:</p>
+
+        <pre><code class="language-bash"># 1. Clone repository
+git clone https://github.com/Lightiam/LightOS.git
+cd LightOS
+
+# 2. Run installer (takes 5-10 minutes)
+sudo ./simple-deploy.sh
+
+# 3. Launch
+lightos</code></pre>
+
+        <div class="alert alert-success">
+            <strong>✅ What it installs:</strong>
+            <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                <li>Python virtual environment at <code>/opt/lightos/venv</code></li>
+                <li>PyTorch with GPU support</li>
+                <li>Transformers, Unsloth, Accelerate</li>
+                <li>LLM training ground</li>
+                <li>Coding agents (GLM-4, Qwen2.5-Coder)</li>
+                <li>System-wide launcher commands</li>
+            </ul>
+        </div>
+
+        <h3>Method 2: Docker</h3>
+        <p>Requires: Docker, Docker Compose, NVIDIA GPU (optional)</p>
+
+        <pre><code class="language-bash"># 1. Clone repository
+git clone https://github.com/Lightiam/LightOS.git
+cd LightOS
+
+# 2. Start container
+docker-compose up
+
+# 3. Access at http://localhost:8080</code></pre>
+
+        <div class="card">
+            <div class="card-title">🐳 Docker Features</div>
+            <ul>
+                <li>Pre-configured environment</li>
+                <li>GPU support (NVIDIA)</li>
+                <li>Persistent volumes</li>
+                <li>Easy updates</li>
+            </ul>
+        </div>
+
+        <h3>Method 3: VirtualBox VM</h3>
+        <p>Perfect for testing or development on Windows/macOS.</p>
+        <a href="virtualbox.html" class="btn">
+            <span>📦</span>
+            <span>VirtualBox Guide</span>
+        </a>
+
+        <h3>Method 4: Bootable ISO</h3>
+        <p>Deploy LightOS on bare metal edge devices.</p>
+        <a href="edge-deployment.html" class="btn">
+            <span>🔧</span>
+            <span>Edge Deployment Guide</span>
+        </a>
+
+        <h2>Post-Installation</h2>
+
+        <h3>Verify Installation</h3>
+        <pre><code class="language-bash"># Check commands are available
+which lightos
+which lightos-train
+which lightos-code
+
+# Test Python environment
+source /opt/lightos/venv/bin/activate
+python3 -c "import torch; print(torch.__version__)"
+python3 -c "import transformers; print(transformers.__version__)"</code></pre>
+
+        <h3>Check GPU</h3>
+        <pre><code class="language-bash"># NVIDIA GPU
+nvidia-smi
+
+# Check CUDA in Python
+python3 -c "import torch; print(torch.cuda.is_available())"
+python3 -c "import torch; print(torch.cuda.get_device_name(0))"</code></pre>
+
+        <h3>Launch LightOS</h3>
+        <pre><code class="language-bash"># Interactive UI
+lightos
+
+# Training interface
+lightos-train
+
+# Coding agent
+lightos-code</code></pre>
+
+        <h2>Troubleshooting</h2>
+
+        <h3>GPU Not Detected</h3>
+        <pre><code class="language-bash"># Check NVIDIA drivers
+nvidia-smi
+
+# Install CUDA drivers
+sudo apt update
+sudo apt install nvidia-driver-535 nvidia-cuda-toolkit
+
+# Verify CUDA
+nvcc --version</code></pre>
+
+        <h3>Command Not Found</h3>
+        <pre><code class="language-bash"># Check if installed
+which lightos
+
+# If not found, ensure /usr/local/bin is in PATH
+echo $PATH | grep /usr/local/bin
+
+# Re-run installer
+cd ~/LightOS
+sudo ./simple-deploy.sh</code></pre>
+
+        <h3>Import Errors</h3>
+        <pre><code class="language-bash"># Activate virtual environment
+source /opt/lightos/venv/bin/activate
+
+# Reinstall dependencies
+pip install --upgrade torch transformers accelerate
+
+# For Unsloth
+pip install unsloth</code></pre>
+
+        <h3>Out of Disk Space</h3>
+        <pre><code class="language-bash"># Check disk usage
+df -h
+
+# Clean up
+sudo apt clean
+docker system prune -a
+
+# Free at least 20GB before installing</code></pre>
+
+        <h2>Updating LightOS</h2>
+        <pre><code class="language-bash">cd ~/LightOS
+git pull origin main
+sudo ./simple-deploy.sh</code></pre>
+
+        <h2>Uninstalling</h2>
+        <pre><code class="language-bash"># Remove system commands
+sudo rm /usr/local/bin/lightos*
+
+# Remove installation directory
+sudo rm -rf /opt/lightos
+
+# Remove configuration
+sudo rm -rf /etc/lightos</code></pre>
+
+        <!-- Next Steps -->
+        <div class="next-steps">
+            <h2>Next Steps</h2>
+            <p>After installation, explore these guides to get the most out of LightOS:</p>
+
+            <div class="next-steps-grid">
+                <a href="quickstart.html" class="next-step-card">
+                    <div class="next-step-icon">🚀</div>
+                    <div class="next-step-title">Quick Start</div>
+                    <div class="next-step-desc">Get up and running in 5 minutes</div>
+                </a>
+
+                <a href="fine-tuning.html" class="next-step-card">
+                    <div class="next-step-icon">🎯</div>
+                    <div class="next-step-title">Fine-Tuning</div>
+                    <div class="next-step-desc">Train your first model</div>
+                </a>
+
+                <a href="coding-agents.html" class="next-step-card">
+                    <div class="next-step-icon">🤖</div>
+                    <div class="next-step-title">Coding Agents</div>
+                    <div class="next-step-desc">Generate code with AI</div>
+                </a>
+
+                <a href="examples.html" class="next-step-card">
+                    <div class="next-step-icon">📚</div>
+                    <div class="next-step-title">Examples</div>
+                    <div class="next-step-desc">Run practical examples</div>
+                </a>
+
+                <a href="../api/python-api.html" class="next-step-card">
+                    <div class="next-step-icon">📖</div>
+                    <div class="next-step-title">API Reference</div>
+                    <div class="next-step-desc">Explore the API</div>
+                </a>
+
+                <a href="inference-subsystem.html" class="next-step-card">
+                    <div class="next-step-icon">⚡</div>
+                    <div class="next-step-title">Inference</div>
+                    <div class="next-step-desc">High-performance inference</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="alert alert-info" style="margin-top: 3rem;">
+            <strong>💡 Need Help?</strong>
+            <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                <li><strong>Issues:</strong> <a href="https://github.com/Lightiam/LightOS/issues" style="color: inherit;">github.com/Lightiam/LightOS/issues</a></li>
+                <li><strong>Discussions:</strong> <a href="https://github.com/Lightiam/LightOS/discussions" style="color: inherit;">github.com/Lightiam/LightOS/discussions</a></li>
+                <li><strong>Documentation:</strong> <a href="../index.html" style="color: inherit;">LightOS Documentation</a></li>
+            </ul>
+        </div>
+    </main>
+
+    <!-- Prism.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <script>
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+
+            // Update button icon
+            const btn = document.querySelector('.theme-toggle');
+            btn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.querySelector('.theme-toggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+        // Mobile menu toggle
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // Close sidebar on link click (mobile)
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 1024) {
+                    document.getElementById('sidebar').classList.remove('open');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
