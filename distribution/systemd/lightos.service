@@ -1,0 +1,47 @@
+[Unit]
+Description=LightOS Inference Server
+Documentation=https://github.com/lightiam/lightos
+After=network.target
+
+[Service]
+Type=simple
+User=lightos
+Group=lightos
+WorkingDirectory=/var/lib/lightos
+
+# Environment
+Environment="LIGHTOS_PORT=50051"
+Environment="LIGHTOS_DEVICES=auto"
+Environment="LIGHTOS_LOG_LEVEL=INFO"
+EnvironmentFile=-/etc/lightos/config.env
+
+# Start server
+ExecStart=/usr/bin/python3 /usr/bin/lightos-server \
+    --port=${LIGHTOS_PORT} \
+    --devices=${LIGHTOS_DEVICES} \
+    --log-level=${LIGHTOS_LOG_LEVEL}
+
+# Restart policy
+Restart=on-failure
+RestartSec=10s
+StartLimitInterval=5min
+StartLimitBurst=3
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/lightos /var/log/lightos
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=lightos
+
+[Install]
+WantedBy=multi-user.target
