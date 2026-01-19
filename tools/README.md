@@ -4,7 +4,23 @@ Collection of powerful tools for AI/ML development and deployment.
 
 ## 🛠️ Tools Overview
 
-### 1. LLM VRAM Calculator (`vram_calculator.py`)
+### 1. GPU Kernel Benchmark (`kernel_benchmark.py`)
+
+Comprehensive benchmarking for GPU kernels across multiple DSLs and hardware backends.
+
+**Features:**
+- 10 benchmark suites with 250+ kernel tasks
+- Multi-DSL support (CUDA, Triton, CuteDSL, ROCm, Metal, SYCL)
+- Multi-hardware backends (NVIDIA, AMD, Intel, Apple, TPU, NPU)
+- Correctness-first evaluation (ComputeEval style)
+- fast_p metric (% correct AND fast kernels)
+- Real serving traces and production validation
+
+**Quick Start:** [See Kernel Benchmark section](#4-gpu-kernel-benchmark-kernel_benchmarkpy)
+
+---
+
+### 2. LLM VRAM Calculator (`vram_calculator.py`)
 
 Estimate GPU memory requirements for running Large Language Models.
 
@@ -57,7 +73,7 @@ print(f"Max batch size: {max_batch}")
 
 ---
 
-### 2. Model Compiler (`model_compiler.py`)
+### 3. Model Compiler (`model_compiler.py`)
 
 Optimize AI models through graph compilation and operator fusion.
 
@@ -102,7 +118,7 @@ print(f"Total execution time: {profile['total_execution_time_ms']:.2f} ms")
 
 ---
 
-### 3. AI Lakehouse (`lakehouse.py`)
+### 4. AI Lakehouse (`lakehouse.py`)
 
 Unified data platform for AI/ML workflows combining data lake and data warehouse.
 
@@ -183,6 +199,120 @@ results = lakehouse.vector_store.search(query_embedding, top_k=5)
 
 ---
 
+### 5. GPU Kernel Benchmark - Detailed (`kernel_benchmark.py`)
+
+Comprehensive benchmarking for GPU kernels across multiple DSLs and hardware backends.
+
+**Features:**
+- Multi-DSL support (CUDA, Triton, CuteDSL, ROCm, Metal, SYCL)
+- Multi-hardware backends (NVIDIA, AMD, Intel, Apple, TPU, NPU)
+- Correctness-first evaluation (inspired by ComputeEval)
+- Performance measurement with fast_p metric
+- 250+ kernel tasks across 10 benchmark suites
+- Real serving traces and production validation
+
+**Benchmark Suites:**
+
+| Suite | Tasks | Description |
+|-------|-------|-------------|
+| **KernelBench** | 250 | PyTorch tasks → CUDA/Triton |
+| **Robust-KBench** | 250 | Hardened against reward hacking |
+| **TritonBench** | 50 | GitHub ops + PyTorch-aligned |
+| **TritonGym** | 30 | Agentic workflows with standardized tools |
+| **FlashInfer-Bench** | 25 | Real serving traces (vLLM/SGLang) |
+| **BackendBench** | 100 | Meta's PyTorch shipping tests |
+| **MultiKernelBench** | 285 | Cross-platform (CUDA+NPU+TPU+SYCL) |
+| **ROCm Triton** | 50 | AMD ROCm GPU benchmarks |
+| **ComputeEval** | 75 | NVIDIA correctness-first |
+| **METR Level 5** | 10 | Frontier difficulty (DeepSeek-V3, SSMs) |
+
+**Usage:**
+
+```python
+from tools.kernel_benchmark import (
+    KernelBenchmarkSuite, BenchmarkSuite, DSLType, HardwareBackend
+)
+
+# Initialize benchmark suite
+suite = KernelBenchmarkSuite()
+
+# Run KernelBench on NVIDIA GPU with Triton
+results = suite.run_suite(
+    suite=BenchmarkSuite.KERNELBENCH,
+    dsl=DSLType.TRITON,
+    backend=HardwareBackend.NVIDIA_GPU,
+    max_tasks=50
+)
+
+# Generate comprehensive report
+print(suite.generate_report())
+```
+
+**fast_p Metric:**
+
+The `fast_p` metric measures the percentage of kernels that are **both correct AND fast**:
+
+```
+fast_p(threshold) = (# correct AND speedup ≥ threshold) / total_kernels
+```
+
+Standard thresholds:
+- `fast_100`: ≥1.00x (baseline or faster)
+- `fast_105`: ≥1.05x (5% faster)
+- `fast_110`: ≥1.10x (10% faster) — **Primary metric**
+- `fast_120`: ≥1.20x (20% faster)
+- `fast_150`: ≥1.50x (50% faster)
+- `fast_200`: ≥2.00x (2x faster)
+
+**Kernel Categories:**
+
+- **MatMul**: Dense matrix multiplication (various sizes)
+- **Convolution**: 2D convolutions for CNNs
+- **Attention**: Multi-head attention mechanisms
+- **Flash Attention**: Memory-efficient attention (FlashAttention-2)
+- **Grouped Query Attention**: GQA with KV cache (Llama-style)
+- **Reduction**: Sum, max, min operations
+- **LayerNorm**: Layer normalization
+- **Softmax**: Numerically stable softmax
+- **Fused Ops**: MatMul+ReLU, MatMul+GELU, Conv+BN+ReLU
+- **Sparse**: Sparse MoE (DeepSeek-V3 style)
+- **Quantization**: INT8, INT4 quantized operations
+
+**Interactive Web UI:** `docs-site/tools/kernel-benchmark.html`
+
+**Example Output:**
+
+```
+LightOS GPU Kernel Benchmark Report
+======================================================================
+
+OVERALL METRICS
+──────────────────────────────────────────────────────────────────────
+Total Kernels:              50
+Correct Kernels:            43
+Correctness Rate:           86.0%
+
+FAST_P METRICS (Correct AND Fast)
+──────────────────────────────────────────────────────────────────────
+fast_100 (≥1.00x):          86.0%
+fast_105 (≥1.05x):          78.0%
+fast_110 (≥1.10x):          72.0%  ← Primary metric
+fast_120 (≥1.20x):          64.0%
+fast_150 (≥1.50x):          48.0%
+fast_200 (≥2.00x):          28.0%
+
+BREAKDOWN BY BENCHMARK SUITE
+──────────────────────────────────────────────────────────────────────
+
+KERNELBENCH                    Tasks:  25  Correct:  88.0%  fast_p:  76.0%
+TRITONBENCH                    Tasks:  15  Correct:  86.7%  fast_p:  73.3%
+METR_LEVEL5                    Tasks:  10  Correct:  80.0%  fast_p:  60.0%
+
+======================================================================
+```
+
+---
+
 ## 📊 Quick Start
 
 ### Run VRAM Calculator
@@ -250,6 +380,44 @@ Step 3: Deploy model to production
   Throughput: 400 QPS
 ```
 
+### Run GPU Kernel Benchmark
+
+```bash
+cd tools
+python3 kernel_benchmark.py
+```
+
+Output:
+```
+======================================================================
+Running kernelbench benchmark suite
+DSL: triton, Backend: nvidia
+Tasks: 5
+======================================================================
+
+Benchmarking: MatMul 1024x1024 @ 1024x1024 (triton)
+  → Checking correctness...
+  ✓ Correctness passed
+  → Benchmarking performance...
+  ✓ Performance: 0.112 ms
+  ✓ Speedup: 1.34x
+
+LightOS GPU Kernel Benchmark Report
+======================================================================
+
+OVERALL METRICS
+──────────────────────────────────────────────────────────────────────
+Total Kernels:              50
+Correct Kernels:            43
+Correctness Rate:           86.0%
+
+FAST_P METRICS (Correct AND Fast)
+──────────────────────────────────────────────────────────────────────
+fast_110 (≥1.10x):          72.0%  ← Primary metric
+fast_120 (≥1.20x):          64.0%
+fast_150 (≥1.50x):          48.0%
+```
+
 ---
 
 ## 🌐 Web Interfaces
@@ -265,6 +433,18 @@ Open in browser: `docs-site/tools/vram-calculator.html`
 - Inference and training modes
 - Support for 10+ popular models
 
+### Kernel Benchmark Web UI
+
+Open in browser: `docs-site/tools/kernel-benchmark.html`
+
+**Features:**
+- Select from 10 benchmark suites
+- Choose DSL type (CUDA, Triton, CuteDSL, ROCm, Metal, SYCL)
+- Select hardware backend (NVIDIA, AMD, Intel, Apple, TPU, NPU)
+- Real-time fast_p metric visualization
+- Performance breakdown by category
+- Detailed results table with correctness and speedup
+
 ---
 
 ## 📚 Integration with LightOS
@@ -276,6 +456,7 @@ from lightos_accelerated import LightDevice, ExecutionGraph
 from tools.vram_calculator import VRAMCalculator
 from tools.model_compiler import ModelCompiler
 from tools.lakehouse import AILakehouse
+from tools.kernel_benchmark import KernelBenchmarkSuite, BenchmarkSuite, DSLType
 
 # 1. Calculate VRAM requirements
 device = LightDevice(DeviceType.NVIDIA, 0)
@@ -289,6 +470,15 @@ optimized_graph = compiler.compile(execution_graph)
 # 3. Register in lakehouse
 lakehouse = AILakehouse()
 lakehouse.model_registry.register_model(model_metadata, artifacts_path)
+
+# 4. Benchmark custom kernels
+benchmark = KernelBenchmarkSuite()
+results = benchmark.run_suite(
+    suite=BenchmarkSuite.KERNELBENCH,
+    dsl=DSLType.TRITON,
+    backend=device.get_backend()
+)
+print(benchmark.generate_report())
 ```
 
 ---
@@ -312,6 +502,7 @@ pip install lightos-accelerated
 - [VRAM Calculator Guide](../docs-site/tools/vram-calculator.html)
 - [Model Compiler Guide](../inference-subsystem/docs/MODERN_FEATURES.md#model-compiler)
 - [AI Lakehouse Guide](../inference-subsystem/docs/MODERN_FEATURES.md#ai-lakehouse)
+- [GPU Kernel Benchmark Guide](../docs-site/tools/kernel-benchmark.html)
 
 ---
 
