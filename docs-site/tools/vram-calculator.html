@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM VRAM Calculator - LightOS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4f46e5;
+            --secondary: #10b981;
+            --background: #0f172a;
+            --surface: #1e293b;
+            --text: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-left: 2rem;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .panel {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .panel-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        select, input {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .slider-container {
+            margin-top: 0.5rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+
+        .value-display {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: #6366f1;
+            transform: translateY(-2px);
+        }
+
+        .result-card {
+            background: var(--background);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .result-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+            padding-top: 0.75rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .result-label {
+            color: var(--text-secondary);
+        }
+
+        .result-value {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .gpu-recommendations {
+            margin-top: 1.5rem;
+        }
+
+        .gpu-card {
+            background: var(--background);
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border);
+        }
+
+        .gpu-card:hover {
+            border-color: var(--primary);
+        }
+
+        .gpu-name {
+            font-weight: 600;
+        }
+
+        .gpu-count {
+            background: var(--success);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">⚡ LightOS Tools</div>
+            <nav>
+                <a href="../docs.html">Documentation</a>
+                <a href="../guides/installation-all-platforms.html">Installation</a>
+                <a href="model-compiler.html">Compiler</a>
+                <a href="lakehouse.html">Lakehouse</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>LLM VRAM Calculator</h1>
+        <p class="subtitle">Estimate GPU memory requirements for running Large Language Models</p>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchMode('inference')">Inference</div>
+            <div class="tab" onclick="switchMode('training')">Training</div>
+        </div>
+
+        <div class="calculator-grid">
+            <div class="panel">
+                <div class="panel-title">Configuration</div>
+
+                <div class="form-group">
+                    <label for="model-select">Model</label>
+                    <select id="model-select" onchange="updateCalculation()">
+                        <option value="custom">Custom Model</option>
+                        <optgroup label="Llama Models">
+                            <option value="llama-3.1-8b">Llama-3.1-8B</option>
+                            <option value="llama-3.1-70b" selected>Llama-3.1-70B</option>
+                            <option value="llama-3.1-405b">Llama-3.1-405B</option>
+                        </optgroup>
+                        <optgroup label="Qwen Models">
+                            <option value="qwen-2.5-7b">Qwen-2.5-7B</option>
+                            <option value="qwen-2.5-72b">Qwen-2.5-72B</option>
+                        </optgroup>
+                        <optgroup label="Other Models">
+                            <option value="deepseek-r1-7b">DeepSeek-R1-7B</option>
+                            <option value="deepseek-r1-67b">DeepSeek-R1-67B</option>
+                            <option value="mistral-7b">Mistral-7B</option>
+                            <option value="mixtral-8x7b">Mixtral-8x7B</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="precision-select">Precision</label>
+                    <select id="precision-select" onchange="updateCalculation()">
+                        <option value="fp32">FP32 (32-bit float)</option>
+                        <option value="fp16" selected>FP16 (16-bit float)</option>
+                        <option value="bf16">BF16 (Brain float 16)</option>
+                        <option value="fp8">FP8 (8-bit float)</option>
+                        <option value="int8">INT8 (8-bit integer)</option>
+                        <option value="int4">INT4 (4-bit integer)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="batch-size">
+                        Batch Size <span class="value-display" id="batch-value">1</span>
+                    </label>
+                    <div class="slider-container">
+                        <input type="range" id="batch-size" min="1" max="128" value="1"
+                               oninput="updateSlider('batch', this.value); updateCalculation()">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="context-length">
+                        Context Length <span class="value-display" id="context-value">4096</span>
+                    </label>
+                    <div class="slider-container">
+                        <input type="range" id="context-length" min="512" max="131072" value="4096" step="512"
+                               oninput="updateSlider('context', this.value); updateCalculation()">
+                    </div>
+                </div>
+
+                <div class="form-group" id="training-options" style="display: none;">
+                    <label for="optimizer-select">Optimizer</label>
+                    <select id="optimizer-select" onchange="updateCalculation()">
+                        <option value="adamw" selected>AdamW</option>
+                        <option value="sgd">SGD with Momentum</option>
+                    </select>
+                </div>
+
+                <button class="btn" onclick="updateCalculation()">Calculate VRAM</button>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">Results</div>
+
+                <div class="result-card">
+                    <div class="result-title">VRAM Breakdown</div>
+                    <div class="result-row">
+                        <span class="result-label">Model Weights</span>
+                        <span class="result-value" id="result-weights">0.00 GB</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">KV Cache</span>
+                        <span class="result-value" id="result-kv">0.00 GB</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Activations</span>
+                        <span class="result-value" id="result-activations">0.00 GB</span>
+                    </div>
+                    <div class="result-row" id="result-optimizer-row" style="display: none;">
+                        <span class="result-label">Optimizer States</span>
+                        <span class="result-value" id="result-optimizer">0.00 GB</span>
+                    </div>
+                    <div class="result-row" id="result-gradients-row" style="display: none;">
+                        <span class="result-label">Gradients</span>
+                        <span class="result-value" id="result-gradients">0.00 GB</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Overhead (10%)</span>
+                        <span class="result-value" id="result-overhead">0.00 GB</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Total VRAM Required</span>
+                        <span class="result-value" id="result-total">0.00 GB</span>
+                    </div>
+                </div>
+
+                <div class="gpu-recommendations">
+                    <div class="result-title">GPU Recommendations</div>
+                    <div id="gpu-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const MODEL_CONFIGS = {
+            'llama-3.1-8b': { params: 8.0, layers: 32, hidden: 4096, heads: 32 },
+            'llama-3.1-70b': { params: 70.0, layers: 80, hidden: 8192, heads: 64 },
+            'llama-3.1-405b': { params: 405.0, layers: 126, hidden: 16384, heads: 128 },
+            'qwen-2.5-7b': { params: 7.0, layers: 28, hidden: 3584, heads: 28 },
+            'qwen-2.5-72b': { params: 72.0, layers: 80, hidden: 8192, heads: 64 },
+            'deepseek-r1-7b': { params: 7.0, layers: 30, hidden: 4096, heads: 32 },
+            'deepseek-r1-67b': { params: 67.0, layers: 64, hidden: 8192, heads: 64 },
+            'mistral-7b': { params: 7.0, layers: 32, hidden: 4096, heads: 32 },
+            'mixtral-8x7b': { params: 47.0, layers: 32, hidden: 4096, heads: 32 },
+        };
+
+        const PRECISION_BYTES = {
+            'fp32': 4,
+            'fp16': 2,
+            'bf16': 2,
+            'fp8': 1,
+            'int8': 1,
+            'int4': 0.5
+        };
+
+        const GPU_TYPES = [
+            { name: 'RTX 4090', vram: 24 },
+            { name: 'RTX 4080', vram: 16 },
+            { name: 'A100 40GB', vram: 40 },
+            { name: 'A100 80GB', vram: 80 },
+            { name: 'H100', vram: 80 },
+            { name: 'H100 NVL (Dual)', vram: 188 },
+            { name: 'MI300X', vram: 192 },
+        ];
+
+        let currentMode = 'inference';
+
+        function switchMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const trainingOptions = document.getElementById('training-options');
+            const optimizerRow = document.getElementById('result-optimizer-row');
+            const gradientsRow = document.getElementById('result-gradients-row');
+
+            if (mode === 'training') {
+                trainingOptions.style.display = 'block';
+                optimizerRow.style.display = 'flex';
+                gradientsRow.style.display = 'flex';
+            } else {
+                trainingOptions.style.display = 'none';
+                optimizerRow.style.display = 'none';
+                gradientsRow.style.display = 'none';
+            }
+
+            updateCalculation();
+        }
+
+        function updateSlider(type, value) {
+            if (type === 'batch') {
+                document.getElementById('batch-value').textContent = value;
+            } else if (type === 'context') {
+                document.getElementById('context-value').textContent = value;
+            }
+        }
+
+        function updateCalculation() {
+            const modelKey = document.getElementById('model-select').value;
+            if (modelKey === 'custom') return;
+
+            const config = MODEL_CONFIGS[modelKey];
+            const precision = document.getElementById('precision-select').value;
+            const batchSize = parseInt(document.getElementById('batch-size').value);
+            const contextLength = parseInt(document.getElementById('context-length').value);
+
+            // Calculate model weights
+            const bytesPerParam = PRECISION_BYTES[precision];
+            const modelWeightsGB = (config.params * 1e9 * bytesPerParam) / (1024 ** 3);
+
+            // Calculate KV cache
+            const headDim = config.hidden / config.heads;
+            const kvElementsPerLayer = batchSize * contextLength * config.heads * headDim * 2;
+            const totalKVElements = kvElementsPerLayer * config.layers;
+            const kvCacheGB = (totalKVElements * bytesPerParam) / (1024 ** 3);
+
+            // Calculate activations
+            const activationPerToken = config.hidden * 6; // Approximate
+            const totalActivations = batchSize * contextLength * activationPerToken * config.layers;
+            let activationsGB = (totalActivations * bytesPerParam) / (1024 ** 3);
+
+            // Inference uses less activation memory
+            if (currentMode === 'inference') {
+                activationsGB *= 0.1;
+            }
+
+            // Optimizer states and gradients (training only)
+            let optimizerGB = 0;
+            let gradientsGB = 0;
+
+            if (currentMode === 'training') {
+                const optimizer = document.getElementById('optimizer-select').value;
+                const optimizerBytesPerParam = optimizer === 'adamw' ? 8 : 4;
+                optimizerGB = (config.params * 1e9 * optimizerBytesPerParam) / (1024 ** 3);
+                gradientsGB = (config.params * 1e9 * 4) / (1024 ** 3); // FP32 gradients
+            }
+
+            // Calculate total
+            const subtotal = modelWeightsGB + kvCacheGB + activationsGB + optimizerGB + gradientsGB;
+            const overheadGB = subtotal * 0.1;
+            const totalGB = subtotal + overheadGB;
+
+            // Update UI
+            document.getElementById('result-weights').textContent = modelWeightsGB.toFixed(2) + ' GB';
+            document.getElementById('result-kv').textContent = kvCacheGB.toFixed(2) + ' GB';
+            document.getElementById('result-activations').textContent = activationsGB.toFixed(2) + ' GB';
+            document.getElementById('result-optimizer').textContent = optimizerGB.toFixed(2) + ' GB';
+            document.getElementById('result-gradients').textContent = gradientsGB.toFixed(2) + ' GB';
+            document.getElementById('result-overhead').textContent = overheadGB.toFixed(2) + ' GB';
+            document.getElementById('result-total').textContent = totalGB.toFixed(2) + ' GB';
+
+            // Update GPU recommendations
+            updateGPURecommendations(totalGB);
+        }
+
+        function updateGPURecommendations(totalGB) {
+            const gpuList = document.getElementById('gpu-list');
+            gpuList.innerHTML = '';
+
+            const recommendations = GPU_TYPES.map(gpu => {
+                const numGPUs = Math.ceil(totalGB / gpu.vram);
+                return { ...gpu, numGPUs, totalVRAM: gpu.vram * numGPUs };
+            }).filter(rec => rec.numGPUs <= 8).slice(0, 5);
+
+            recommendations.forEach(rec => {
+                const card = document.createElement('div');
+                card.className = 'gpu-card';
+                card.innerHTML = `
+                    <span class="gpu-name">${rec.numGPUs}x ${rec.name} (${rec.totalVRAM} GB)</span>
+                    <span class="gpu-count">${rec.numGPUs === 1 ? 'Fits!' : rec.numGPUs + ' GPUs'}</span>
+                `;
+                gpuList.appendChild(card);
+            });
+        }
+
+        // Initial calculation
+        updateCalculation();
+    </script>
+</body>
+</html>
