@@ -1,0 +1,19 @@
+{
+  "debug": false,
+  "logFile": "/var/log/lightos-runtime.log",
+  "runtimePath": "/usr/bin/runc",
+  "defaultStrategy": "balanced",
+  "preferredVendor": "any",
+  "blacklistDevices": [],
+  "whitelistDevices": [],
+  "enableMultiGPU": false,
+  "maxGPUPerContainer": 1,
+  "injectDrivers": true,
+  "cudaPath": "/usr/local/cuda",
+  "rocmPath": "/opt/rocm",
+  "oneAPIPath": "/opt/intel/oneapi",
+  "enableMetrics": true,
+  "metricsPort": 9100,
+  "metricsPath": "/metrics",
+  "enableCostTracking": true
+}
