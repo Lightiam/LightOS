@@ -1,0 +1,345 @@
+name: Build and Release LightOS
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g., 1.0.0)'
+        required: true
+        default: '1.0.0'
+
+env:
+  PYTHON_VERSION: '3.11'
+  CMAKE_VERSION: '3.25'
+
+jobs:
+  # ============================================================================
+  # Build Python wheels for all platforms
+  # ============================================================================
+  build-wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, macos-13, macos-14, windows-2022]
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install build dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build libgomp1 libopenblas-dev
+
+      - name: Install build dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install cmake ninja libomp
+
+      - name: Install build dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install cmake ninja
+
+      - name: Install Python build tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install build wheel setuptools
+
+      - name: Build wheel
+        working-directory: inference-subsystem/python-bindings
+        run: |
+          python -m build --wheel --outdir dist/
+
+      - name: Upload wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheel-${{ matrix.os }}-py${{ matrix.python-version }}
+          path: inference-subsystem/python-bindings/dist/*.whl
+          retention-days: 7
+
+  # ============================================================================
+  # Build native binaries for all platforms
+  # ============================================================================
+  build-binaries:
+    name: Build binary for ${{ matrix.config.os }}-${{ matrix.config.arch }}
+    runs-on: ${{ matrix.config.runner }}
+    strategy:
+      matrix:
+        config:
+          - {os: linux, arch: x86_64, runner: ubuntu-22.04}
+          - {os: linux, arch: arm64, runner: ubuntu-22.04-arm}
+          - {os: macos, arch: x86_64, runner: macos-13}
+          - {os: macos, arch: arm64, runner: macos-14}
+          - {os: windows, arch: x86_64, runner: windows-2022}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies (Linux)
+        if: matrix.config.os == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build g++ libgomp1 libopenblas-dev
+
+      - name: Install dependencies (macOS)
+        if: matrix.config.os == 'macos'
+        run: |
+          brew install cmake ninja libomp
+
+      - name: Install dependencies (Windows)
+        if: matrix.config.os == 'windows'
+        run: |
+          choco install cmake ninja visualstudio2022buildtools
+
+      - name: Build LightOS Core
+        working-directory: inference-subsystem/core
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=install \
+            -DBUILD_TESTING=OFF \
+            -DBUILD_EXAMPLES=OFF
+          cmake --build build --parallel
+          cmake --install build
+
+      - name: Package binary
+        run: |
+          cd inference-subsystem/core/install
+          tar -czf ../../../lightos-${{ matrix.config.os }}-${{ matrix.config.arch }}.tar.gz *
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: binary-${{ matrix.config.os }}-${{ matrix.config.arch }}
+          path: lightos-${{ matrix.config.os }}-${{ matrix.config.arch }}.tar.gz
+          retention-days: 7
+
+  # ============================================================================
+  # Build Docker images
+  # ============================================================================
+  build-docker:
+    name: Build Docker image for ${{ matrix.platform }}
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        platform: [linux/amd64, linux/arm64]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: inference-subsystem
+          file: inference-subsystem/deployment/Dockerfile.optimized
+          platforms: ${{ matrix.platform }}
+          push: true
+          tags: |
+            lightos/lightos-inference:latest
+            lightos/lightos-inference:${{ github.ref_name }}
+          cache-from: type=registry,ref=lightos/lightos-inference:buildcache
+          cache-to: type=registry,ref=lightos/lightos-inference:buildcache,mode=max
+
+  # ============================================================================
+  # Build VM/OVA images
+  # ============================================================================
+  build-vm:
+    name: Build VM image - ${{ matrix.variant }}
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        variant: [minimal, gpu, enterprise]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Packer
+        run: |
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get update && sudo apt-get install packer
+
+      - name: Install VirtualBox
+        run: |
+          sudo apt-get install -y virtualbox virtualbox-ext-pack
+
+      - name: Build VM with Packer
+        working-directory: distribution/packer
+        run: |
+          packer init lightos-${{ matrix.variant }}.pkr.hcl
+          packer build lightos-${{ matrix.variant }}.pkr.hcl
+
+      - name: Upload OVA
+        uses: actions/upload-artifact@v4
+        with:
+          name: vm-${{ matrix.variant }}
+          path: distribution/packer/output/*.ova
+          retention-days: 7
+
+  # ============================================================================
+  # Build Windows Installer (MSI)
+  # ============================================================================
+  build-windows-installer:
+    name: Build Windows Installer
+    runs-on: windows-2022
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install WiX Toolset
+        run: |
+          choco install wixtoolset -y
+
+      - name: Build MSI
+        working-directory: distribution/windows
+        run: |
+          candle installer.wxs -o installer.wixobj
+          light installer.wixobj -o LightOS-Setup-${{ github.ref_name }}.msi
+
+      - name: Upload MSI
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: distribution/windows/LightOS-Setup-*.msi
+          retention-days: 7
+
+  # ============================================================================
+  # Build macOS Installer (PKG)
+  # ============================================================================
+  build-macos-installer:
+    name: Build macOS Installer
+    runs-on: macos-14
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build PKG
+        working-directory: distribution/macos
+        run: |
+          ./build-pkg.sh ${{ github.ref_name }}
+
+      - name: Sign and Notarize
+        env:
+          APPLE_DEVELOPER_ID: ${{ secrets.APPLE_DEVELOPER_ID }}
+          APPLE_NOTARIZATION_PASSWORD: ${{ secrets.APPLE_NOTARIZATION_PASSWORD }}
+        run: |
+          # Sign PKG
+          productsign --sign "$APPLE_DEVELOPER_ID" \
+            distribution/macos/LightOS-Installer.pkg \
+            distribution/macos/LightOS-Installer-signed.pkg
+
+          # Notarize
+          xcrun notarytool submit distribution/macos/LightOS-Installer-signed.pkg \
+            --apple-id "$APPLE_DEVELOPER_ID" \
+            --password "$APPLE_NOTARIZATION_PASSWORD" \
+            --wait
+
+      - name: Upload PKG
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-installer
+          path: distribution/macos/LightOS-Installer-signed.pkg
+          retention-days: 7
+
+  # ============================================================================
+  # Build Linux AppImage
+  # ============================================================================
+  build-appimage:
+    name: Build Linux AppImage
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install AppImage tools
+        run: |
+          wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x appimagetool-x86_64.AppImage
+
+      - name: Build AppImage
+        working-directory: distribution/appimage
+        run: |
+          ./build-appimage.sh
+
+      - name: Upload AppImage
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-appimage
+          path: distribution/appimage/LightOS-*.AppImage
+          retention-days: 7
+
+  # ============================================================================
+  # Create GitHub Release
+  # ============================================================================
+  create-release:
+    name: Create GitHub Release
+    needs: [build-wheels, build-binaries, build-docker, build-vm, build-windows-installer, build-macos-installer, build-appimage]
+    runs-on: ubuntu-22.04
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            release-artifacts/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ============================================================================
+  # Publish to PyPI
+  # ============================================================================
+  publish-pypi:
+    name: Publish to PyPI
+    needs: [build-wheels]
+    runs-on: ubuntu-22.04
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheel-*
+          path: dist
+          merge-multiple: true
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          packages-dir: dist/

@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Installation Guide - All Platforms - LightOS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4f46e5;
+            --secondary: #10b981;
+            --background: #0f172a;
+            --surface: #1e293b;
+            --text: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --code-bg: #1e293b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            margin-bottom: 3rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-left: 2rem;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin: 3rem 0 1.5rem 0;
+            color: var(--primary);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem 0;
+            color: var(--secondary);
+        }
+
+        h4 {
+            font-size: 1.2rem;
+            margin: 1.5rem 0 0.75rem 0;
+            color: var(--text);
+        }
+
+        .platform-tabs {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            color: var(--text);
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .tab-button:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .tab-button.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .method-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .method-card {
+            background: var(--background);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .method-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+        }
+
+        .method-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .method-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .method-time {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .difficulty {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .difficulty-easy {
+            background: var(--success);
+            color: white;
+        }
+
+        .difficulty-medium {
+            background: var(--warning);
+            color: white;
+        }
+
+        .difficulty-hard {
+            background: var(--error);
+            color: white;
+        }
+
+        code {
+            background: var(--code-bg);
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: var(--secondary);
+        }
+
+        pre {
+            background: var(--code-bg);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--text);
+        }
+
+        .step {
+            background: var(--background);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid var(--primary);
+        }
+
+        .step-number {
+            background: var(--primary);
+            color: white;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 1rem;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background: rgba(79, 70, 229, 0.1);
+            border-color: var(--primary);
+            color: var(--text);
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--success);
+            color: var(--text);
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: var(--warning);
+            color: var(--text);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comparison-table th {
+            background: var(--code-bg);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .comparison-table tr:hover {
+            background: var(--code-bg);
+        }
+
+        .checkmark {
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .xmark {
+            color: var(--error);
+            font-weight: bold;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 3rem;
+            color: var(--primary);
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+
+        .back-link:hover {
+            transform: translateX(-4px);
+        }
+
+        .toc {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin: 2rem 0;
+            border: 1px solid var(--border);
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 1rem;
+        }
+
+        .toc li {
+            margin: 0.5rem 0;
+        }
+
+        .toc a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .toc a:hover {
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">⚡ LightOS</div>
+            <nav>
+                <a href="../docs.html">Documentation</a>
+                <a href="quickstart.html">Quick Start</a>
+                <a href="kubernetes.html">Kubernetes</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>Installation Guide - All Platforms</h1>
+
+        <div class="alert alert-info">
+            <strong>📖 Platform-Specific Guides:</strong>
+            <ul style="margin-top: 0.5rem; padding-left: 2rem;">
+                <li><a href="../INSTALL_WINDOWS.md" style="color: var(--primary);">Windows Installation Guide</a> - Detailed step-by-step for Windows 10/11</li>
+                <li>macOS Installation Guide - See tabs below</li>
+                <li>Linux Installation Guide - See tabs below</li>
+            </ul>
+        </div>
+
+        <!-- Platform Selection Tabs -->
+        <div class="platform-tabs">
+            <button class="tab-button active" onclick="showPlatform('macos')">🍎 macOS</button>
+            <button class="tab-button" onclick="showPlatform('linux')">🐧 Linux</button>
+            <button class="tab-button" onclick="showPlatform('docker')">🐳 Docker</button>
+            <button class="tab-button" onclick="showPlatform('cloud')">☁️ Cloud</button>
+        </div>
+
+        <!-- macOS Tab -->
+        <div id="macos" class="tab-content active">
+            <h2>macOS Installation</h2>
+
+            <p>Install LightOS on macOS (Intel and Apple Silicon supported)</p>
+
+            <!-- Method Selection -->
+            <div class="method-grid">
+                <div class="method-card" onclick="location.href='#macos-homebrew'">
+                    <div class="method-icon">🍺</div>
+                    <div class="method-title">Homebrew</div>
+                    <div class="method-time">2-3 minutes</div>
+                    <span class="difficulty difficulty-easy">⭐ Easy</span>
+                    <p style="margin-top: 1rem; color: var(--text-secondary);">Recommended for macOS users</p>
+                </div>
+
+                <div class="method-card" onclick="location.href='#macos-pip'">
+                    <div class="method-icon">🐍</div>
+                    <div class="method-title">pip (Python)</div>
+                    <div class="method-time">2-4 minutes</div>
+                    <span class="difficulty difficulty-easy">⭐ Easy</span>
+                    <p style="margin-top: 1rem; color: var(--text-secondary);">For Python developers</p>
+                </div>
+
+                <div class="method-card" onclick="location.href='#macos-pkg'">
+                    <div class="method-icon">📦</div>
+                    <div class="method-title">PKG Installer</div>
+                    <div class="method-time">3-5 minutes</div>
+                    <span class="difficulty difficulty-easy">⭐ Easy</span>
+                    <p style="margin-top: 1rem; color: var(--text-secondary);">One-click installation</p>
+                </div>
+
+                <div class="method-card" onclick="location.href='#macos-source'">
+                    <div class="method-icon">🛠️</div>
+                    <div class="method-title">From Source</div>
+                    <div class="method-time">15-20 minutes</div>
+                    <span class="difficulty difficulty-hard">⭐⭐⭐ Advanced</span>
+                    <p style="margin-top: 1rem; color: var(--text-secondary);">For contributors</p>
+                </div>
+            </div>
+
+            <!-- Homebrew Method -->
+            <h3 id="macos-homebrew">Method 1: Homebrew (Recommended)</h3>
+
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Install Homebrew (if not already installed)</strong>
+                <pre><code>/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Add LightOS tap</strong>
+                <pre><code>brew tap lightiam/lightos</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>Install LightOS</strong>
+                <pre><code># Standard installation
+brew install lightos
+
+# With CUDA support (for external NVIDIA eGPU)
+brew install lightos --with-cuda</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">4</span>
+                <strong>Verify installation</strong>
+                <pre><code>lightos --version
+python3 -c "from lightos_accelerated import LightDevice; print('✅ LightOS ready!')"</code></pre>
+            </div>
+
+            <div class="alert alert-success">
+                <strong>✅ Installation complete!</strong> LightOS is now ready to use.
+            </div>
+
+            <!-- pip Method -->
+            <h3 id="macos-pip">Method 2: pip (Python Package)</h3>
+
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Ensure Python 3.8+ is installed</strong>
+                <pre><code>python3 --version
+# Should show Python 3.8 or later
+
+# If not installed:
+brew install python@3.11</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Install LightOS via pip</strong>
+                <pre><code>pip3 install lightos-accelerated</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>Install optional components</strong>
+                <pre><code># For gRPC server
+pip3 install lightos-accelerated[server]
+
+# For Jupyter notebooks
+pip3 install lightos-accelerated[jupyter]
+
+# Install everything
+pip3 install lightos-accelerated[all]</code></pre>
+            </div>
+
+            <!-- PKG Installer Method -->
+            <h3 id="macos-pkg">Method 3: PKG Installer</h3>
+
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Download PKG installer</strong>
+                <p style="margin-top: 0.5rem;">Visit <a href="https://github.com/lightiam/lightos/releases/latest" style="color: var(--primary);">GitHub Releases</a> and download <code>LightOS-Installer-v1.0.0.pkg</code></p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Run the installer</strong>
+                <ul style="margin-top: 0.5rem; padding-left: 2rem;">
+                    <li>Double-click the downloaded PKG file</li>
+                    <li>If macOS warns "unidentified developer", go to System Preferences → Security & Privacy → "Open Anyway"</li>
+                    <li>Follow the installation wizard</li>
+                    <li>Enter administrator password when prompted</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>Verify installation</strong>
+                <pre><code>lightos --version</code></pre>
+            </div>
+
+            <!-- From Source Method -->
+            <h3 id="macos-source">Method 4: Build from Source</h3>
+
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Install dependencies</strong>
+                <pre><code>brew install cmake ninja python@3.11 libomp</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Clone repository</strong>
+                <pre><code>git clone https://github.com/lightiam/lightos.git
+cd lightos</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>Build C++ core</strong>
+                <pre><code>cd inference-subsystem/core
+cmake -B build -G Ninja \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
+cmake --build build --parallel
+sudo cmake --install build</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">4</span>
+                <strong>Install Python bindings</strong>
+                <pre><code>cd ../python-bindings
+pip3 install -e .</code></pre>
+            </div>
+        </div>
+
+        <!-- Linux Tab -->
+        <div id="linux" class="tab-content">
+            <h2>Linux Installation</h2>
+
+            <p>Install LightOS on Ubuntu, Debian, Fedora, and other Linux distributions</p>
+
+            <!-- Method Selection -->
+            <div class="method-grid">
+                <div class="method-card" onclick="location.href='#linux-apt'">
+                    <div class="method-icon">📦</div>
+                    <div class="method-title">APT (Ubuntu/Debian)</div>
+                    <div class="method-time">1-2 minutes</div>
+                    <span class="difficulty difficulty-easy">⭐ Easy</span>
+                    <p style="margin-top: 1rem; color: var(--text-secondary);">Recommended for Ubuntu/Debian</p>
+                </div>
+
+                <div class="method-card" onclick="location.href='#linux-pip'">
+                    <div class="method-icon">🐍</div>
+                    <div class="method-title">pip (Universal)</div>
+                    <div class="method-time">2-4 minutes</div>
+                    <span class="difficulty difficulty-easy">⭐ Easy</span>
+                    <p style="margin-top: 1rem; color: var(--text-secondary);">Works on all distros</p>
+                </div>
+
+                <div class="method-card" onclick="location.href='#linux-appimage'">
+                    <div class="method-icon">📱</div>
+                    <div class="method-title">AppImage</div>
+                    <div class="method-time">1 minute</div>
+                    <span class="difficulty difficulty-easy">⭐ Easy</span>
+                    <p style="margin-top: 1rem; color: var(--text-secondary);">Portable, no installation</p>
+                </div>
+
+                <div class="method-card" onclick="location.href='#linux-source'">
+                    <div class="method-icon">🛠️</div>
+                    <div class="method-title">From Source</div>
+                    <div class="method-time">10-15 minutes</div>
+                    <span class="difficulty difficulty-medium">⭐⭐ Medium</span>
+                    <p style="margin-top: 1rem; color: var(--text-secondary);">For custom builds</p>
+                </div>
+            </div>
+
+            <!-- APT Method -->
+            <h3 id="linux-apt">Method 1: APT (Ubuntu/Debian)</h3>
+
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Add LightOS repository</strong>
+                <pre><code># Add GPG key
+curl -fsSL https://packages.lightos.ai/gpg | sudo apt-key add -
+
+# Add repository
+echo "deb https://packages.lightos.ai/apt stable main" | sudo tee /etc/apt/sources.list.d/lightos.list
+
+# Update package list
+sudo apt update</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Install LightOS</strong>
+                <pre><code># Core package
+sudo apt install lightos
+
+# With NVIDIA GPU support
+sudo apt install lightos-cuda
+
+# With AMD GPU support
+sudo apt install lightos-rocm
+
+# Development headers
+sudo apt install lightos-dev
+
+# Documentation
+sudo apt install lightos-doc</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>Start systemd service</strong>
+                <pre><code># Start LightOS server
+sudo systemctl start lightos
+
+# Enable auto-start on boot
+sudo systemctl enable lightos
+
+# Check status
+sudo systemctl status lightos</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">4</span>
+                <strong>Verify installation</strong>
+                <pre><code>lightos --version
+python3 -c "from lightos_accelerated import LightDevice; print('✅ Ready!')"</code></pre>
+            </div>
+
+            <!-- pip Method for Linux -->
+            <h3 id="linux-pip">Method 2: pip (Universal)</h3>
+
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Install Python and dependencies</strong>
+                <pre><code># Ubuntu/Debian
+sudo apt install python3 python3-pip python3-dev build-essential
+
+# Fedora/RHEL
+sudo dnf install python3 python3-pip python3-devel gcc-c++
+
+# Arch Linux
+sudo pacman -S python python-pip base-devel</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Install LightOS</strong>
+                <pre><code>pip3 install lightos-accelerated</code></pre>
+            </div>
+
+            <!-- AppImage Method -->
+            <h3 id="linux-appimage">Method 3: AppImage (Portable)</h3>
+
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Download AppImage</strong>
+                <pre><code>wget https://github.com/lightiam/lightos/releases/latest/download/LightOS-x86_64.AppImage
+chmod +x LightOS-x86_64.AppImage</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Run LightOS</strong>
+                <pre><code># Run directly (no installation needed)
+./LightOS-x86_64.AppImage --version
+
+# Or install system-wide
+./LightOS-x86_64.AppImage --install</code></pre>
+            </div>
+
+            <!-- From Source for Linux -->
+            <h3 id="linux-source">Method 4: Build from Source</h3>
+
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Install build dependencies</strong>
+                <pre><code># Ubuntu/Debian
+sudo apt install build-essential cmake ninja-build python3-dev libgomp1 libopenblas-dev
+
+# Fedora/RHEL
+sudo dnf groupinstall "Development Tools"
+sudo dnf install cmake ninja-build python3-devel openblas-devel</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Clone and build</strong>
+                <pre><code>git clone https://github.com/lightiam/lightos.git
+cd lightos/inference-subsystem/core
+
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel
+sudo cmake --install build
+
+cd ../python-bindings
+pip3 install -e .</code></pre>
+            </div>
+
+            <h3>GPU Support on Linux</h3>
+
+            <div class="step">
+                <span class="step-number">NVIDIA</span>
+                <strong>NVIDIA GPU Setup</strong>
+                <pre><code># Install NVIDIA drivers
+sudo apt install nvidia-driver-535
+
+# Install CUDA Toolkit
+wget https://developer.download.nvidia.com/compute/cuda/12.3.0/local_installers/cuda_12.3.0_545.23.06_linux.run
+sudo sh cuda_12.3.0_545.23.06_linux.run
+
+# Verify
+nvidia-smi
+nvcc --version</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">AMD</span>
+                <strong>AMD GPU Setup (ROCm)</strong>
+                <pre><code># Add ROCm repository
+wget -qO - https://repo.radeon.com/rocm/rocm.gpg.key | sudo apt-key add -
+echo "deb [arch=amd64] https://repo.radeon.com/rocm/apt/5.7 ubuntu main" | sudo tee /etc/apt/sources.list.d/rocm.list
+
+# Install ROCm
+sudo apt update
+sudo apt install rocm-dkms
+
+# Verify
+rocm-smi</code></pre>
+            </div>
+        </div>
+
+        <!-- Docker Tab -->
+        <div id="docker" class="tab-content">
+            <h2>Docker Installation</h2>
+
+            <p>Run LightOS in a containerized environment (all platforms)</p>
+
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Install Docker</strong>
+                <pre><code># Linux (Ubuntu/Debian)
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+
+# macOS: Download Docker Desktop
+# https://www.docker.com/products/docker-desktop/
+
+# Windows: Download Docker Desktop
+# https://www.docker.com/products/docker-desktop/</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Pull LightOS image</strong>
+                <pre><code>docker pull lightos/lightos-inference:latest
+
+# Verify image size (should be <700MB)
+docker images lightos/lightos-inference</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>Run container</strong>
+                <pre><code># CPU-only
+docker run -d -p 50051:50051 --name lightos lightos/lightos-inference:latest
+
+# With NVIDIA GPU
+docker run -d -p 50051:50051 --gpus all --name lightos lightos/lightos-inference:latest
+
+# With AMD GPU
+docker run -d -p 50051:50051 --device=/dev/kfd --device=/dev/dri --name lightos lightos/lightos-inference:latest</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">4</span>
+                <strong>Verify container</strong>
+                <pre><code># Check status
+docker ps
+
+# View logs
+docker logs lightos
+
+# Interactive Python session
+docker exec -it lightos python3</code></pre>
+            </div>
+
+            <h3>Docker Compose</h3>
+
+            <p>Create <code>docker-compose.yml</code>:</p>
+            <pre><code>version: '3.8'
+
+services:
+  lightos:
+    image: lightos/lightos-inference:latest
+    ports:
+      - "50051:50051"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    environment:
+      - LIGHTOS_PORT=50051
+      - LIGHTOS_DEVICES=auto
+    restart: unless-stopped</code></pre>
+
+            <p>Run with:</p>
+            <pre><code>docker-compose up -d</code></pre>
+        </div>
+
+        <!-- Cloud Tab -->
+        <div id="cloud" class="tab-content">
+            <h2>Cloud Deployment</h2>
+
+            <p>Deploy LightOS on AWS, Azure, or Google Cloud Platform</p>
+
+            <h3>AWS EC2</h3>
+
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Launch EC2 instance</strong>
+                <pre><code>aws ec2 run-instances \
+  --image-id ami-lightos-gpu \
+  --instance-type p3.2xlarge \
+  --key-name your-key \
+  --security-group-ids sg-xxxxxxxx</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>SSH and install</strong>
+                <pre><code>ssh -i your-key.pem ubuntu@ec2-instance
+
+# Install via pip
+pip3 install lightos-accelerated
+
+# Or use Docker
+docker pull lightos/lightos-inference:latest</code></pre>
+            </div>
+
+            <h3>Azure VM</h3>
+
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Create VM</strong>
+                <pre><code>az vm create \
+  --resource-group lightos-rg \
+  --name lightos-vm \
+  --image UbuntuLTS \
+  --size Standard_NC6 \
+  --admin-username azureuser</code></pre>
+            </div>
+
+            <h3>Google Cloud Platform</h3>
+
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Create instance with GPU</strong>
+                <pre><code>gcloud compute instances create lightos-vm \
+  --zone=us-central1-a \
+  --machine-type=n1-standard-4 \
+  --accelerator=type=nvidia-tesla-v100,count=1 \
+  --image-family=ubuntu-2204-lts \
+  --image-project=ubuntu-os-cloud</code></pre>
+            </div>
+
+            <h3>Kubernetes (All Cloud Providers)</h3>
+
+            <p>See our <a href="kubernetes.html" style="color: var(--primary);">complete Kubernetes deployment guide</a>.</p>
+
+            <pre><code># Quick deploy
+helm install lightos lightos/lightos-inference \
+  --set replicas=3 \
+  --set resources.limits.nvidia.com/gpu=1</code></pre>
+        </div>
+
+        <!-- Comparison Table -->
+        <h2>Installation Methods Comparison</h2>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Method</th>
+                    <th>Platform</th>
+                    <th>Install Time</th>
+                    <th>Disk Space</th>
+                    <th>Auto-Update</th>
+                    <th>Offline</th>
+                    <th>GPU Support</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>pip</strong></td>
+                    <td>All</td>
+                    <td>2-5 min</td>
+                    <td>100MB</td>
+                    <td class="checkmark">✓</td>
+                    <td class="xmark">✗</td>
+                    <td class="checkmark">✓</td>
+                </tr>
+                <tr>
+                    <td><strong>Homebrew</strong></td>
+                    <td>macOS/Linux</td>
+                    <td>2-3 min</td>
+                    <td>150MB</td>
+                    <td class="checkmark">✓</td>
+                    <td class="xmark">✗</td>
+                    <td class="checkmark">✓</td>
+                </tr>
+                <tr>
+                    <td><strong>APT</strong></td>
+                    <td>Ubuntu/Debian</td>
+                    <td>1-2 min</td>
+                    <td>100MB</td>
+                    <td class="checkmark">✓</td>
+                    <td>Partial</td>
+                    <td class="checkmark">✓</td>
+                </tr>
+                <tr>
+                    <td><strong>Docker</strong></td>
+                    <td>All</td>
+                    <td>3-5 min</td>
+                    <td>700MB</td>
+                    <td class="checkmark">✓</td>
+                    <td class="checkmark">✓</td>
+                    <td class="checkmark">✓</td>
+                </tr>
+                <tr>
+                    <td><strong>AppImage</strong></td>
+                    <td>Linux</td>
+                    <td>1 min</td>
+                    <td>120MB</td>
+                    <td class="xmark">✗</td>
+                    <td class="checkmark">✓</td>
+                    <td class="checkmark">✓</td>
+                </tr>
+                <tr>
+                    <td><strong>PKG/MSI</strong></td>
+                    <td>macOS/Windows</td>
+                    <td>3-5 min</td>
+                    <td>120MB</td>
+                    <td class="checkmark">✓</td>
+                    <td class="checkmark">✓</td>
+                    <td class="checkmark">✓</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Quick Links -->
+        <h2>Next Steps</h2>
+
+        <div class="method-grid">
+            <div class="method-card" onclick="location.href='quickstart.html'">
+                <div class="method-icon">🚀</div>
+                <div class="method-title">Quick Start Guide</div>
+                <p style="margin-top: 1rem; color: var(--text-secondary);">5-minute tutorial to get started with LightOS</p>
+            </div>
+
+            <div class="method-card" onclick="location.href='python-api.html'">
+                <div class="method-icon">🐍</div>
+                <div class="method-title">Python API Reference</div>
+                <p style="margin-top: 1rem; color: var(--text-secondary);">Complete Python API documentation</p>
+            </div>
+
+            <div class="method-card" onclick="location.href='kubernetes.html'">
+                <div class="method-icon">☸️</div>
+                <div class="method-title">Kubernetes Deployment</div>
+                <p style="margin-top: 1rem; color: var(--text-secondary);">Production deployment guide</p>
+            </div>
+
+            <div class="method-card" onclick="location.href='../inference-subsystem/notebooks/LightOS_QuickStart.ipynb'">
+                <div class="method-icon">📓</div>
+                <div class="method-title">Jupyter Notebooks</div>
+                <p style="margin-top: 1rem; color: var(--text-secondary);">Interactive tutorials and examples</p>
+            </div>
+        </div>
+
+        <a href="../docs.html" class="back-link">← Back to Documentation</a>
+    </div>
+
+    <script>
+        function showPlatform(platform) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(platform).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

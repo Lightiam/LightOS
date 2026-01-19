@@ -396,7 +396,6 @@
                     <li><a href="guides/installation.html">Install</a></li>
                     <li><a href="guides/quickstart.html">Quick Start</a></li>
                     <li><a href="dcim.html">Dashboard</a></li>
-                    <li><a href="https://github.com/Lightiam/LightOS">GitHub</a></li>
                 </ul>
             </nav>
             <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
@@ -460,11 +459,22 @@
                 </div>
             </a>
 
-            <a href="guides/installation.html" class="doc-card">
+            <a href="guides/installation-all-platforms.html" class="doc-card">
                 <div class="card-icon">📥</div>
-                <div class="card-title">Installation</div>
+                <div class="card-title">Installation - All Platforms</div>
                 <div class="card-description">
-                    Complete installation guide for all platforms: Ubuntu, Docker, VirtualBox, and edge devices.
+                    Complete guide for macOS, Linux, Docker, Cloud. Includes Homebrew, APT, pip, AppImage, and more.
+                </div>
+                <div class="card-links">
+                    <span class="card-link">View guide →</span>
+                </div>
+            </a>
+
+            <a href="../INSTALL_WINDOWS.md" class="doc-card">
+                <div class="card-icon">🪟</div>
+                <div class="card-title">Windows Installation</div>
+                <div class="card-description">
+                    Step-by-step guide for Windows 10/11: pip, Chocolatey, winget, MSI installer, Docker Desktop.
                 </div>
                 <div class="card-links">
                     <span class="card-link">View guide →</span>
@@ -535,6 +545,58 @@
                 <div class="card-title">Kubernetes</div>
                 <div class="card-description">
                     Production-grade K8s deployment with DaemonSet, gRPC, and eBPF integration.
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- AI Tools -->
+    <section class="content">
+        <h2 class="section-title">AI Tools</h2>
+        <p class="section-subtitle">Powerful tools for AI/ML development and optimization</p>
+
+        <div class="cards-grid">
+            <a href="tools/vram-calculator.html" class="doc-card">
+                <div class="card-icon">🧮</div>
+                <div class="card-title">LLM VRAM Calculator</div>
+                <div class="card-description">
+                    Estimate GPU memory requirements for LLMs. Supports 10+ models, all quantization formats, batch size optimization.
+                </div>
+                <div class="card-links">
+                    <span class="card-link">Calculate VRAM →</span>
+                </div>
+            </a>
+
+            <a href="../tools/model_compiler.py" class="doc-card">
+                <div class="card-icon">⚙️</div>
+                <div class="card-title">Model Compiler</div>
+                <div class="card-description">
+                    Optimize AI models with graph compilation and operator fusion. Get 15-30% speedup through automatic optimization.
+                </div>
+                <div class="card-links">
+                    <span class="card-link">View docs →</span>
+                </div>
+            </a>
+
+            <a href="../tools/lakehouse.py" class="doc-card">
+                <div class="card-icon">🏛️</div>
+                <div class="card-title">AI Lakehouse</div>
+                <div class="card-description">
+                    Unified data platform with feature store, model registry, vector store, and RAG support for complete AI workflows.
+                </div>
+                <div class="card-links">
+                    <span class="card-link">View docs →</span>
+                </div>
+            </a>
+
+            <a href="tools/kernel-benchmark.html" class="doc-card">
+                <div class="card-icon">🔬</div>
+                <div class="card-title">GPU Kernel Benchmark</div>
+                <div class="card-description">
+                    Comprehensive kernel benchmarking across DSLs and hardware. 10 suites, 250+ tasks, fast_p metric, correctness-first evaluation.
+                </div>
+                <div class="card-links">
+                    <span class="card-link">Run benchmarks →</span>
                 </div>
             </a>
         </div>
@@ -660,12 +722,12 @@
                 </ul>
             </div>
             <div>
-                <div class="footer-section-title">Community</div>
+                <div class="footer-section-title">Resources</div>
                 <ul class="footer-links">
-                    <li><a href="https://github.com/Lightiam/LightOS">GitHub</a></li>
-                    <li><a href="https://github.com/Lightiam/LightOS/discussions">Discussions</a></li>
-                    <li><a href="https://github.com/Lightiam/LightOS/issues">Issues</a></li>
-                    <li><a href="dcim.html">Dashboard</a></li>
+                    <li><a href="dcim.html">DCIM Dashboard</a></li>
+                    <li><a href="guides/examples.html">Examples</a></li>
+                    <li><a href="guides/troubleshooting.html">Troubleshooting</a></li>
+                    <li><a href="guides/faq.html">FAQ</a></li>
                 </ul>
             </div>
         </div>

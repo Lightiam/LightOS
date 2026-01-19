@@ -3,25 +3,332 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LightOS Documentation</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Kubernetes Deployment - LightOS Documentation</title>
+    <meta name="description" content="Deploy LightOS on Kubernetes with DaemonSet, gRPC control plane, and eBPF integration.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+
     <style>
-        body { font-family: 'Inter', sans-serif; max-width: 900px; margin: 0 auto; padding: 2rem; line-height: 1.6; }
-        h1 { color: #3b82f6; margin-bottom: 1rem; }
-        .back-link { display: inline-block; margin-bottom: 2rem; color: #3b82f6; text-decoration: none; }
-        .back-link:hover { text-decoration: underline; }
+        :root { --primary: #3b82f6; --secondary: #10b981; --accent: #8b5cf6; --text: #1e293b; --bg: #ffffff; --bg-secondary: #f8fafc; --border: #e2e8f0; }
+        [data-theme="dark"] { --text: #f1f5f9; --bg: #0f172a; --bg-secondary: #1e293b; --border: #334155; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; transition: all 0.3s; }
+        .header { background: var(--bg); border-bottom: 1px solid var(--border); padding: 1rem 2rem; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 0.5rem; font-size: 1.5rem; font-weight: 700; color: var(--primary); text-decoration: none; }
+        .theme-toggle { background: none; border: 1px solid var(--border); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; font-size: 1.25rem; }
+        .content { max-width: 900px; margin: 0 auto; padding: 3rem 2rem; }
+        h1 { font-size: 2.5rem; margin-bottom: 1rem; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h2 { font-size: 1.875rem; margin: 2.5rem 0 1rem; color: var(--text); }
+        h3 { font-size: 1.5rem; margin: 2rem 0 0.75rem; color: var(--text); }
+        p, li { color: var(--text); margin-bottom: 0.75rem; }
+        ul { margin-left: 1.5rem; }
+        code { font-family: 'JetBrains Mono', monospace; background: #1e293b; color: #e2e8f0; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.875rem; }
+        pre { background: #1e293b; border-radius: 12px; padding: 1.5rem; overflow-x: auto; margin: 1.5rem 0; }
+        pre code { background: none; padding: 0; }
+        .alert { padding: 1.25rem; border-radius: 8px; margin: 1.5rem 0; border-left: 4px solid; }
+        .alert-info { background: #dbeafe; border-color: #3b82f6; color: #1e40af; }
+        [data-theme="dark"] .alert-info { background: #1e3a8a; color: #93c5fd; }
+        .alert-success { background: #d1fae5; border-color: #10b981; color: #065f46; }
+        [data-theme="dark"] .alert-success { background: #064e3b; color: #6ee7b7; }
+        .card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; }
+        .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: var(--primary); color: white; text-decoration: none; border-radius: 8px; font-weight: 500; margin: 0.5rem 0.5rem 0.5rem 0; transition: all 0.3s; }
+        .btn:hover { background: #2563eb; transform: translateY(-2px); }
+        .back-link { display: inline-block; margin-bottom: 2rem; color: var(--primary); text-decoration: none; }
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+        .feature { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; }
+        .feature-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        .feature-title { font-weight: 600; margin-bottom: 0.5rem; }
     </style>
 </head>
 <body>
-    <a href="../docs.html" class="back-link">← Back to Documentation</a>
-    <h1>Documentation Coming Soon</h1>
-    <p>This page is under construction. Please check back soon or visit the <a href="../docs.html">documentation index</a>.</p>
-    <p>In the meantime, explore:</p>
-    <ul>
-        <li><a href="installation.html">Installation Guide</a></li>
-        <li><a href="../dcim.html">DCIM Dashboard</a></li>
-        <li><a href="https://github.com/Lightiam/LightOS">GitHub Repository</a></li>
-    </ul>
+    <header class="header">
+        <a href="../index.html" class="logo"><span style="font-size: 2rem;">⚡</span><span>LightOS</span></a>
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+    </header>
+
+    <div class="content">
+        <a href="../docs.html" class="back-link">← Back to Documentation</a>
+
+        <h1>☸️ Kubernetes Deployment</h1>
+        <p style="font-size: 1.125rem; color: #64748b; margin-bottom: 3rem;">
+            Deploy LightOS Inference Subsystem on Kubernetes with DaemonSet architecture, gRPC control plane, and eBPF transparent interception.
+        </p>
+
+        <h2>Overview</h2>
+        <p>LightOS provides production-grade Kubernetes integration with:</p>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🔧</div>
+                <div class="feature-title">DaemonSet Architecture</div>
+                <p style="font-size: 0.875rem; color: #64748b;">One agent per node manages all GPUs/NPUs</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🌐</div>
+                <div class="feature-title">gRPC Control Plane</div>
+                <p style="font-size: 0.875rem; color: #64748b;">Centralized orchestration and telemetry</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔌</div>
+                <div class="feature-title">eBPF Interception</div>
+                <p style="font-size: 0.875rem; color: #64748b;">Transparent PyTorch/JAX CUDA redirection</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <div class="feature-title">Real-Time Telemetry</div>
+                <p style="font-size: 0.875rem; color: #64748b;">1Hz streaming via WebSocket/gRPC</p>
+            </div>
+        </div>
+
+        <h2>Quick Start</h2>
+
+        <h3>1. Prerequisites</h3>
+        <pre><code class="language-bash"># Kubernetes cluster with GPU nodes
+kubectl version --client
+
+# NVIDIA GPU Operator (for GPU support)
+kubectl get nodes -o json | grep nvidia.com/gpu</code></pre>
+
+        <h3>2. Install LightOS Agent</h3>
+        <pre><code class="language-bash"># Create namespace
+kubectl create namespace lightos-system
+
+# Deploy NVIDIA device plugin (if not already installed)
+kubectl apply -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/main/nvidia-device-plugin.yml
+
+# Deploy LightOS DaemonSet
+kubectl apply -f - <<EOF
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: lightos-agent
+  namespace: lightos-system
+  labels:
+    app: lightos-agent
+spec:
+  selector:
+    matchLabels:
+      app: lightos-agent
+  template:
+    metadata:
+      labels:
+        app: lightos-agent
+    spec:
+      hostNetwork: true
+      hostPID: true
+      containers:
+      - name: lightos-agent
+        image: lightrail/lightos-agent:latest
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+            - SYS_ADMIN
+            - SYS_PTRACE
+            - NET_ADMIN
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: GRPC_ADDRESS
+          value: "0.0.0.0:50051"
+        - name: ENABLE_EBPF
+          value: "true"
+        volumeMounts:
+        - name: dev
+          mountPath: /dev
+        - name: sys
+          mountPath: /sys
+        - name: bpf
+          mountPath: /sys/fs/bpf
+        resources:
+          limits:
+            nvidia.com/gpu: 8
+      volumes:
+      - name: dev
+        hostPath:
+          path: /dev
+      - name: sys
+        hostPath:
+          path: /sys
+      - name: bpf
+        hostPath:
+          path: /sys/fs/bpf
+          type: DirectoryOrCreate
+      tolerations:
+      - key: nvidia.com/gpu
+        operator: Exists
+        effect: NoSchedule
+EOF</code></pre>
+
+        <h3>3. Verify Installation</h3>
+        <pre><code class="language-bash"># Check DaemonSet status
+kubectl get daemonset -n lightos-system
+
+# View agent logs
+kubectl logs -n lightos-system -l app=lightos-agent --tail=50 -f
+
+# Check GPU detection
+kubectl exec -n lightos-system -it $(kubectl get pod -n lightos-system -l app=lightos-agent -o name | head -1) -- nvidia-smi</code></pre>
+
+        <div class="alert alert-success">
+            <strong>✅ Installation Complete!</strong><br>
+            The LightOS agent is now running on all GPU nodes and managing inference workloads.
+        </div>
+
+        <h2>Configuration</h2>
+
+        <h3>ConfigMap for Advanced Settings</h3>
+        <pre><code class="language-yaml">apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lightos-config
+  namespace: lightos-system
+data:
+  agent.yaml: |
+    grpc_address: "0.0.0.0:50051"
+    fabric_os_endpoint: "fabric-os-service:50052"
+    telemetry_interval_ms: 1000
+
+    # Thermal-aware scheduling
+    power_governor:
+      policy: "predictive_cooling"
+      temperature_warning_c: 75.0
+      temperature_critical_c: 85.0
+      global_power_budget_watts: 5000
+      enable_dynamic_power_cap: true
+
+    # eBPF interception
+    ebpf:
+      enabled: true
+      intercept_libraries:
+        - "libcuda.so"
+        - "libcudart.so"
+        - "libtorch_cuda.so"</code></pre>
+
+        <h2>Monitoring & Observability</h2>
+
+        <h3>Prometheus Integration</h3>
+        <pre><code class="language-bash"># Install Prometheus + Grafana
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm install prometheus prometheus-community/kube-prometheus-stack \
+  --namespace lightos-system \
+  --set grafana.enabled=true
+
+# Access Grafana dashboard
+kubectl port-forward -n lightos-system svc/prometheus-grafana 3000:80</code></pre>
+
+        <div class="alert alert-info">
+            <strong>📊 Dashboard Access:</strong><br>
+            Open <code>http://localhost:3000</code> in your browser<br>
+            Default credentials: <code>admin / prom-operator</code>
+        </div>
+
+        <h3>View Real-Time Telemetry</h3>
+        <pre><code class="language-bash"># Port-forward gRPC endpoint
+kubectl port-forward -n lightos-system svc/lightos-agent 50051:50051
+
+# Connect to telemetry stream (requires grpcurl)
+grpcurl -plaintext localhost:50051 lightos.LightOSAgent/StreamTelemetry</code></pre>
+
+        <h2>Production Deployment</h2>
+
+        <h3>High Availability Setup</h3>
+        <div class="card">
+            <p><strong>Recommended Configuration:</strong></p>
+            <ul>
+                <li>3+ control plane nodes</li>
+                <li>Separate GPU node pool with taints</li>
+                <li>Persistent storage for telemetry (optional)</li>
+                <li>Load balancer for Fabric OS service</li>
+            </ul>
+        </div>
+
+        <h3>Resource Limits</h3>
+        <pre><code class="language-yaml">resources:
+  requests:
+    memory: "512Mi"
+    cpu: "500m"
+  limits:
+    memory: "2Gi"
+    cpu: "2000m"
+    nvidia.com/gpu: "8"  # Manage up to 8 GPUs per node</code></pre>
+
+        <h3>Security Considerations</h3>
+        <div class="card">
+            <ul>
+                <li><strong>Privileged Mode:</strong> Required for eBPF and GPU access</li>
+                <li><strong>Network Policy:</strong> Restrict access to gRPC port 50051</li>
+                <li><strong>RBAC:</strong> Use ServiceAccount with minimal permissions</li>
+                <li><strong>Pod Security:</strong> Apply appropriate pod security standards</li>
+            </ul>
+        </div>
+
+        <h2>Troubleshooting</h2>
+
+        <h3>Agent Not Starting</h3>
+        <pre><code class="language-bash"># Check pod status
+kubectl describe pod -n lightos-system -l app=lightos-agent
+
+# Common issues:
+# 1. GPU not detected - verify nvidia-device-plugin
+# 2. eBPF not loading - check kernel version (5.8+)
+# 3. Permission denied - ensure privileged: true</code></pre>
+
+        <h3>GPU Not Detected</h3>
+        <pre><code class="language-bash"># Verify NVIDIA device plugin
+kubectl get pods -n kube-system | grep nvidia
+
+# Check node labels
+kubectl get nodes --show-labels | grep nvidia</code></pre>
+
+        <h3>High Memory Usage</h3>
+        <pre><code class="language-bash"># Reduce telemetry frequency in ConfigMap
+telemetry_interval_ms: 5000  # Change from 1000 to 5000
+
+# Apply updated config
+kubectl rollout restart daemonset/lightos-agent -n lightos-system</code></pre>
+
+        <h2>Uninstall</h2>
+        <pre><code class="language-bash"># Remove LightOS DaemonSet
+kubectl delete daemonset lightos-agent -n lightos-system
+
+# Remove namespace (this will delete all resources)
+kubectl delete namespace lightos-system</code></pre>
+
+        <h2>Next Steps</h2>
+        <div style="margin: 2rem 0;">
+            <a href="installation.html" class="btn" style="background: var(--secondary);"><span>📥</span>Installation Guide</a>
+            <a href="../dcim.html" class="btn"><span>📊</span>Live Dashboard</a>
+            <a href="inference-subsystem.html" class="btn"><span>⚡</span>Inference Subsystem</a>
+        </div>
+
+        <div class="alert alert-info" style="margin-top: 3rem;">
+            <strong>💡 Need Help?</strong><br>
+            <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                <li><a href="troubleshooting.html" style="color: inherit;">Troubleshooting Guide</a></li>
+                <li><a href="faq.html" style="color: inherit;">FAQ</a></li>
+                <li><a href="../docs.html" style="color: inherit;">Documentation Home</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            document.querySelector('.theme-toggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+        const saved = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', saved);
+        document.querySelector('.theme-toggle').textContent = saved === 'dark' ? '☀️' : '🌙';
+    </script>
 </body>
 </html>

@@ -1,0 +1,30 @@
+# Include documentation
+include README.md
+include LICENSE
+include CHANGELOG.md
+
+# Include C++ source files for compilation
+recursive-include ../core/include *.hpp *.h
+recursive-include ../core/src *.cpp *.cu
+include ../core/CMakeLists.txt
+
+# Include CUDA kernels
+recursive-include ../core/kernels *.cu *.cuh
+
+# Include example notebooks
+recursive-include ../notebooks *.ipynb
+
+# Include deployment files
+include ../deployment/Dockerfile.optimized
+include ../deployment/grpc_server.py
+
+# Exclude build artifacts
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude __pycache__
+global-exclude .DS_Store
+global-exclude *.so
+global-exclude *.o
+global-exclude *.a
+global-exclude build
+global-exclude dist
