@@ -1,0 +1,55 @@
+#!/bin/bash
+# LightOS Container Runtime - Poststop Hook
+# This hook is called after the container stops
+
+set -e
+
+# Read container state from stdin
+STATE=$(cat)
+
+# Extract container ID
+CONTAINER_ID=$(echo "$STATE" | jq -r '.id')
+
+# Log
+echo "[LightOS Runtime] Poststop hook for container: $CONTAINER_ID" >> /var/log/lightos-runtime.log
+
+# Cleanup resources
+BUNDLE_PATH=$(echo "$STATE" | jq -r '.bundle')
+
+if [ -f "$BUNDLE_PATH/config.json" ]; then
+    # Extract device info
+    DEVICE_TYPE=$(jq -r '.annotations["io.lightos.device.type"] // ""' "$BUNDLE_PATH/config.json")
+    DEVICE_INDEX=$(jq -r '.annotations["io.lightos.device.index"] // "0"' "$BUNDLE_PATH/config.json")
+
+    if [ -n "$DEVICE_TYPE" ]; then
+        echo "[LightOS Runtime] Releasing $DEVICE_TYPE device $DEVICE_INDEX" >> /var/log/lightos-runtime.log
+
+        # Device-specific cleanup
+        case "$DEVICE_TYPE" in
+            nvidia)
+                # NVIDIA cleanup (if needed)
+                # nvidia-smi --gpu-reset -i "$DEVICE_INDEX" || true
+                ;;
+
+            amd)
+                # AMD cleanup (if needed)
+                ;;
+
+            intel)
+                # Intel cleanup (if needed)
+                ;;
+        esac
+    fi
+fi
+
+# Update metrics
+if [ -f "/var/run/lightos-runtime/metrics.json" ]; then
+    # Record container stop time
+    TIMESTAMP=$(date +%s)
+    jq --arg id "$CONTAINER_ID" --arg ts "$TIMESTAMP" \
+        '.containers[$id].stop_time = $ts' \
+        /var/run/lightos-runtime/metrics.json > /tmp/metrics.tmp && \
+        mv /tmp/metrics.tmp /var/run/lightos-runtime/metrics.json || true
+fi
+
+exit 0

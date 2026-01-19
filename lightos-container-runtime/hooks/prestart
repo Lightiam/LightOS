@@ -1,0 +1,79 @@
+#!/bin/bash
+# LightOS Container Runtime - Prestart Hook
+# This hook is called before the container starts
+
+set -e
+
+# Read container state from stdin
+STATE=$(cat)
+
+# Extract container ID and bundle path
+CONTAINER_ID=$(echo "$STATE" | jq -r '.id')
+BUNDLE_PATH=$(echo "$STATE" | jq -r '.bundle')
+
+# Log
+echo "[LightOS Runtime] Prestart hook for container: $CONTAINER_ID" >> /var/log/lightos-runtime.log
+
+# Call main runtime binary
+/usr/bin/lightos-runtime prestart --bundle "$BUNDLE_PATH" <<< "$STATE"
+
+# Setup device permissions
+if [ -f "$BUNDLE_PATH/config.json" ]; then
+    # Extract device type from annotations
+    DEVICE_TYPE=$(jq -r '.annotations["io.lightos.device.type"] // ""' "$BUNDLE_PATH/config.json")
+    DEVICE_INDEX=$(jq -r '.annotations["io.lightos.device.index"] // "0"' "$BUNDLE_PATH/config.json")
+
+    if [ -n "$DEVICE_TYPE" ]; then
+        echo "[LightOS Runtime] Configuring $DEVICE_TYPE device $DEVICE_INDEX" >> /var/log/lightos-runtime.log
+
+        case "$DEVICE_TYPE" in
+            nvidia)
+                # Load NVIDIA modules if not loaded
+                if ! lsmod | grep -q nvidia; then
+                    modprobe nvidia || true
+                    modprobe nvidia-uvm || true
+                fi
+
+                # Set device permissions
+                if [ -e "/dev/nvidia${DEVICE_INDEX}" ]; then
+                    chmod 666 "/dev/nvidia${DEVICE_INDEX}" || true
+                fi
+                chmod 666 /dev/nvidiactl || true
+                chmod 666 /dev/nvidia-uvm || true
+                ;;
+
+            amd)
+                # Load AMD modules
+                if ! lsmod | grep -q amdgpu; then
+                    modprobe amdgpu || true
+                fi
+
+                # Set device permissions
+                if [ -e "/dev/dri/card${DEVICE_INDEX}" ]; then
+                    chmod 666 "/dev/dri/card${DEVICE_INDEX}" || true
+                fi
+                if [ -e "/dev/dri/renderD$((128 + DEVICE_INDEX))" ]; then
+                    chmod 666 "/dev/dri/renderD$((128 + DEVICE_INDEX))" || true
+                fi
+                chmod 666 /dev/kfd || true
+                ;;
+
+            intel)
+                # Load Intel modules
+                if ! lsmod | grep -q i915; then
+                    modprobe i915 || true
+                fi
+
+                # Set device permissions
+                if [ -e "/dev/dri/card${DEVICE_INDEX}" ]; then
+                    chmod 666 "/dev/dri/card${DEVICE_INDEX}" || true
+                fi
+                if [ -e "/dev/dri/renderD$((128 + DEVICE_INDEX))" ]; then
+                    chmod 666 "/dev/dri/renderD$((128 + DEVICE_INDEX))" || true
+                fi
+                ;;
+        esac
+    fi
+fi
+
+exit 0

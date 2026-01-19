@@ -1,0 +1,211 @@
+# Example Kubernetes Pods using LightOS Container Runtime
+
+---
+# Example 1: NVIDIA GPU Pod
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nvidia-gpu-pod
+  labels:
+    app: gpu-workload
+spec:
+  containers:
+  - name: cuda-container
+    image: nvidia/cuda:11.8.0-base-ubuntu22.04
+    command: ["nvidia-smi"]
+    resources:
+      limits:
+        lightos.io/nvidia: 1
+        memory: 4Gi
+      requests:
+        lightos.io/nvidia: 1
+        memory: 2Gi
+
+---
+# Example 2: AMD GPU Pod
+apiVersion: v1
+kind: Pod
+metadata:
+  name: amd-gpu-pod
+  labels:
+    app: gpu-workload
+spec:
+  containers:
+  - name: rocm-container
+    image: rocm/pytorch:latest
+    command: ["rocm-smi"]
+    resources:
+      limits:
+        lightos.io/amd: 1
+        memory: 4Gi
+      requests:
+        lightos.io/amd: 1
+        memory: 2Gi
+
+---
+# Example 3: Intel GPU Pod
+apiVersion: v1
+kind: Pod
+metadata:
+  name: intel-gpu-pod
+  labels:
+    app: gpu-workload
+spec:
+  containers:
+  - name: oneapi-container
+    image: intel/oneapi-basekit:latest
+    command: ["sycl-ls"]
+    resources:
+      limits:
+        lightos.io/intel: 1
+        memory: 4Gi
+      requests:
+        lightos.io/intel: 1
+        memory: 2Gi
+
+---
+# Example 4: Any GPU Pod (automatic selection)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: any-gpu-pod
+  labels:
+    app: gpu-workload
+  annotations:
+    lightos.io/strategy: "balanced"
+    lightos.io/min-vram: "8GB"
+spec:
+  containers:
+  - name: pytorch-container
+    image: pytorch/pytorch:latest
+    command:
+    - python
+    - -c
+    - |
+      import torch
+      print(f"CUDA available: {torch.cuda.is_available()}")
+      if torch.cuda.is_available():
+        print(f"CUDA device: {torch.cuda.get_device_name(0)}")
+        print(f"CUDA version: {torch.version.cuda}")
+    resources:
+      limits:
+        # List multiple GPU types - will use first available
+        lightos.io/nvidia: 1
+        lightos.io/amd: 1
+        lightos.io/intel: 1
+        memory: 8Gi
+      requests:
+        memory: 4Gi
+
+---
+# Example 5: Multi-GPU Training Job
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: multi-gpu-training
+spec:
+  template:
+    metadata:
+      labels:
+        app: training
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: trainer
+        image: pytorch/pytorch:latest
+        command:
+        - torchrun
+        - --nproc_per_node=2
+        - train.py
+        resources:
+          limits:
+            lightos.io/nvidia: 2  # Request 2 GPUs
+            memory: 32Gi
+          requests:
+            lightos.io/nvidia: 2
+            memory: 16Gi
+        env:
+        - name: MASTER_ADDR
+          value: "localhost"
+        - name: MASTER_PORT
+          value: "29500"
+
+---
+# Example 6: Deployment with GPU
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inference-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: inference
+  template:
+    metadata:
+      labels:
+        app: inference
+      annotations:
+        lightos.io/strategy: "cost"  # Use cheapest available GPU
+    spec:
+      containers:
+      - name: model-server
+        image: tritonserver:latest
+        ports:
+        - containerPort: 8000
+          name: http
+        - containerPort: 8001
+          name: grpc
+        resources:
+          limits:
+            lightos.io/nvidia: 1
+            lightos.io/amd: 1
+            memory: 8Gi
+          requests:
+            memory: 4Gi
+        livenessProbe:
+          httpGet:
+            path: /v2/health/live
+            port: 8000
+          initialDelaySeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /v2/health/ready
+            port: 8000
+          initialDelaySeconds: 10
+
+---
+# Example 7: StatefulSet with Persistent GPU Assignment
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gpu-statefulset
+spec:
+  serviceName: gpu-service
+  replicas: 2
+  selector:
+    matchLabels:
+      app: gpu-app
+  template:
+    metadata:
+      labels:
+        app: gpu-app
+    spec:
+      containers:
+      - name: app
+        image: your-gpu-app:latest
+        resources:
+          limits:
+            lightos.io/nvidia: 1
+            memory: 16Gi
+        volumeMounts:
+        - name: data
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 100Gi
