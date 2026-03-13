@@ -5,6 +5,13 @@ Stores (chunk_text, embedding) pairs and supports top-k cosine similarity search
 from typing import List, Dict, Any
 import uuid
 import math
+import os
+import json
+
+DATA_DIR = os.getenv("DATA_DIR", "../data")
+os.makedirs(DATA_DIR, exist_ok=True)
+INDEX_PATH = os.path.join(DATA_DIR, "faiss_index.bin")
+CHUNKS_PATH = os.path.join(DATA_DIR, "faiss_chunks.json")
 
 try:
     import faiss
@@ -19,19 +26,45 @@ EMBEDDING_DIM = 384
 class VectorStore:
     def __init__(self):
         self._chunks: List[Dict[str, Any]] = []  # {"id": str, "text": str, "embedding": List[float]}
+        self._index = None
+
+        if os.path.exists(CHUNKS_PATH):
+            try:
+                with open(CHUNKS_PATH, 'r') as f:
+                    self._chunks = json.load(f)
+            except Exception as e:
+                print(f"Failed to load chunks from disk: {e}")
+
         if _USE_FAISS:
             import numpy as np
-            self._index = faiss.IndexFlatL2(EMBEDDING_DIM)
-        else:
-            self._index = None
+            if os.path.exists(INDEX_PATH):
+                try:
+                    self._index = faiss.read_index(INDEX_PATH)
+                except Exception as e:
+                    print(f"Failed to load index from disk: {e}")
+                    self._index = faiss.IndexFlatL2(EMBEDDING_DIM)
+            else:
+                self._index = faiss.IndexFlatL2(EMBEDDING_DIM)
 
     def add(self, text: str, embedding: List[float]) -> str:
         chunk_id = str(uuid.uuid4())[:8]
         self._chunks.append({"id": chunk_id, "text": text, "embedding": embedding})
+        
+        try:
+            with open(CHUNKS_PATH, 'w') as f:
+                json.dump(self._chunks, f)
+        except Exception as e:
+            print(f"Failed to save chunks to disk: {e}")
+
         if _USE_FAISS and self._index is not None:
             import numpy as np
             vec = np.array([embedding], dtype="float32")
             self._index.add(vec)
+            try:
+                faiss.write_index(self._index, INDEX_PATH)
+            except Exception as e:
+                print(f"Failed to save index to disk: {e}")
+                
         return chunk_id
 
     def search(self, query_embedding: List[float], top_k: int = 5) -> List[Dict[str, Any]]:

@@ -1,8 +1,14 @@
-# LightOS Core — API Reference
+# LightOS Core — Control Plane & API Reference
 
-LightOS Core is the orchestration backend for the LightOS Aurora dashboard.
-It provides four microservices that power context retrieval, dynamic model routing,
-LightMicro/Base/Max inference, and telemetry collection.
+LightOS Core is the orchestration backend for the LightOS Aurora dashboard and the **Control Plane** for data center integrations. It provides four microservices that power context retrieval, dynamic model routing, LightMicro/Base/Max inference, and telemetry collection.
+
+## Data Center Integration Architecture
+
+The LightOS Core exposes a REST control plane API that directly integrates with Kubernetes, SLURM, or custom orchestrators.
+
+- **Orchestrator Integration:** Data centers interact with this API to register LightOS as a device plugin. This makes diverse underlying hardware (CUDA, ROCm, Photonic) appear as unified schedulable resources in the cluster.
+- **Hyperscaler & Co-lo Support:** Scales seamlessly across hyperscalers (integrating via HAL for custom silicon) and on-prem enterprise clusters.
+- **Photonic NPU Native:** Serves as the first unified control layer for next-generation photonic NPU clusters, providing the essential OS abstraction that hardware currently lacks.
 
 ---
 
@@ -192,14 +198,21 @@ Changes take effect on next request (hot-reload via `POST /config/update`).
 
 ---
 
-## Swapping in Real Models
+## Swapping in Real Models (v0.2 Readiness)
 
-Replace the mock adapters in `inference-proxy/model_adapters.py` with:
-- **vLLM**: `from vllm import LLM; llm = LLM(model="...")`
-- **SGLang**: Point the adapter at an SGLang server endpoint
-- **OpenAI-compatible API**: Replace `generate()` with an HTTP call
+The Inference Proxy automatically relies on rapid mock responses for testing if no real model is configured. 
+To route inference to actual LLMs (via any OpenAI-compatible API such as vLLM, Groq, local Ollama, or OpenAI natively), set the corresponding environment variables for the model tier you want to power.
 
-The adapter interface is fixed: `generate(prompt, max_tokens, temperature) → dict`
+| Tier | Environment Variables | Example |
+|---|---|---|
+| **LightMicro** | `LIGHTMICRO_MODEL`<br>`LIGHTMICRO_BASE_URL`<br>`LIGHTMICRO_API_KEY` | `llama3-8b-8192`<br>`https://api.groq.com/openai/v1`<br>`gsk_...` |
+| **LightBase** | `LIGHTBASE_MODEL`<br>`LIGHTBASE_BASE_URL`<br>`LIGHTBASE_API_KEY` | `mixtral-8x7b-32768`<br>`https://api.groq.com/openai/v1`<br>`gsk_...` |
+| **LightMax** | `LIGHTMAX_MODEL`<br>`LIGHTMAX_BASE_URL`<br>`LIGHTMAX_API_KEY` | `gpt-4o`<br>`https://api.openai.com/v1`<br>`sk-...` |
+
+When a `_MODEL` variable is detected for a tier, the Proxy provisions a real asyncio-powered OpenAI client and streams requests directly to that backend.
+
+**Native Deployment:** Set these in your shell before running `.\run_all.ps1`. 
+**Docker Deployment:** Add them to an `.env` file alongside `docker-compose.yml`.
 
 ---
 

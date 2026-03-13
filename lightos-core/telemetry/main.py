@@ -6,12 +6,16 @@ and builds Model-Job Template clusters for Antigravity optimization.
 Port: 8013
 """
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 import time
 import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from shared.auth import verify_api_key
 
 from models import TelemetryDB
 
@@ -80,33 +84,33 @@ async def health():
 
 
 @app.post("/telemetry/event")
-async def record_event(event: TelemetryEvent):
+async def record_event(event: TelemetryEvent, tenant_id: str = Depends(verify_api_key)):
     """Store a single telemetry event."""
     db.insert(event.model_dump())
     return {"status": "recorded", "job_id": event.job_id}
 
 
 @app.get("/telemetry/jobs")
-async def list_jobs(limit: int = Query(default=50, le=500)):
+async def list_jobs(limit: int = Query(default=50, le=500), tenant_id: str = Depends(verify_api_key)):
     """Return recent jobs for the Workload List panel."""
     rows = db.recent_jobs(limit)
     return {"jobs": rows, "count": len(rows)}
 
 
 @app.get("/telemetry/summary")
-async def get_summary():
+async def get_summary(tenant_id: str = Depends(verify_api_key)):
     """Return aggregated metrics for Cost & Utilization charts."""
     return db.summary()
 
 
 @app.get("/telemetry/templates")
-async def get_templates():
+async def get_templates(tenant_id: str = Depends(verify_api_key)):
     """Return Model-Job Template clusters (grouped by tier + domain)."""
     return db.model_job_templates()
 
 
 @app.get("/telemetry/timeseries")
-async def get_timeseries(hours: int = Query(default=24, le=168)):
+async def get_timeseries(hours: int = Query(default=24, le=168), tenant_id: str = Depends(verify_api_key)):
     """Return hourly aggregated metrics for time-series charts."""
     return db.hourly_series(hours)
 

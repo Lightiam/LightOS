@@ -5,7 +5,7 @@ Handles: text chunking, embedding, vector search, semantic + exact cache.
 Port: 8010
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
@@ -13,6 +13,11 @@ import hashlib
 import time
 import uuid
 import asyncio
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from shared.auth import verify_api_key
 
 from chunker import chunk_text
 from embedder import embed_texts, embed_query
@@ -134,7 +139,7 @@ async def stats():
 
 
 @app.post("/context/retrieve", response_model=ContextResponse)
-async def retrieve_context(req: ContextRequest):
+async def retrieve_context(req: ContextRequest, tenant_id: str = Depends(verify_api_key)):
     t0 = time.time()
     request_id = str(uuid.uuid4())[:8]
 

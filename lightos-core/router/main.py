@@ -5,13 +5,17 @@ Dynamic model routing: selects LightMicro / LightBase / LightMax based on SLO, c
 Port: 8011
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
 import time
 import yaml
 import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from shared.auth import verify_api_key
 
 from policy_engine import PolicyEngine
 
@@ -95,7 +99,7 @@ async def get_policy():
 
 
 @app.post("/router/route", response_model=RouteResponse)
-async def route_request(req: RouteRequest):
+async def route_request(req: RouteRequest, tenant_id: str = Depends(verify_api_key)):
     """Evaluate routing rules and return optimal model tier + context config."""
     result = policy.evaluate(
         prompt_length=req.prompt_length,
@@ -108,7 +112,7 @@ async def route_request(req: RouteRequest):
 
 
 @app.post("/config/update")
-async def update_policy(req: PolicyUpdateRequest):
+async def update_policy(req: PolicyUpdateRequest, tenant_id: str = Depends(verify_api_key)):
     """Hot-reload routing rules from submitted YAML."""
     try:
         new_rules = yaml.safe_load(req.rules_yaml)

@@ -1832,9 +1832,13 @@
 
     // ── Helpers ───────────────────────────────────────────────────────
     async function agFetch(url, method = 'GET', body = null) {
+        const apiKey = localStorage.getItem('LIGHTOS_API_KEY') || 'sk-lightos-demo';
         const opts = {
             method,
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-API-Key': apiKey
+            },
             signal: AbortSignal.timeout(8000)
         };
         if (body) opts.body = JSON.stringify(body);

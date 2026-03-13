@@ -6,7 +6,16 @@ Schema-compatible for real model backend (vLLM, SGLang) swap-in.
 import time
 import random
 import math
+import os
+import asyncio
+import logging
 from typing import Dict, Any, Optional
+
+try:
+    from openai import AsyncOpenAI
+    OPENAI_AVAILABLE = True
+except ImportError:
+    OPENAI_AVAILABLE = False
 
 
 LIGHTOS_ANSWERS = {
@@ -65,14 +74,14 @@ class ModelAdapter:
         self.tier = tier
         self.config = TIER_CONFIG[tier]
 
-    def generate(self, prompt: str, max_tokens: int = 512, temperature: float = 0.7) -> Dict[str, Any]:
+    async def generate(self, prompt: str, max_tokens: int = 512, temperature: float = 0.7) -> Dict[str, Any]:
         t0 = time.time()
 
         # Simulate processing latency
         cfg = self.config
         latency_s = (cfg["base_latency_ms"] + random.uniform(-cfg["latency_variance"], cfg["latency_variance"])) / 1000
         latency_s = max(0.01, latency_s)
-        time.sleep(latency_s)
+        await asyncio.sleep(latency_s)
 
         # Pick an answer
         answers = LIGHTOS_ANSWERS.get(self.tier, ["LightOS processed your request."])
@@ -102,7 +111,60 @@ class ModelAdapter:
         }
 
 
-def get_adapter(tier: str) -> Optional[ModelAdapter]:
-    if tier in TIER_CONFIG:
-        return ModelAdapter(tier)
-    return None
+class RealModelAdapter:
+    def __init__(self, tier: str, model_name: str, base_url: str, api_key: str):
+        self.tier = tier
+        self.config = TIER_CONFIG[tier]
+        self.model_name = model_name
+        self.client = AsyncOpenAI(api_key=api_key, base_url=base_url)
+
+    async def generate(self, prompt: str, max_tokens: int = 512, temperature: float = 0.7) -> Dict[str, Any]:
+        t0 = time.time()
+        
+        try:
+            response = await self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=max_tokens,
+                temperature=temperature
+            )
+            answer = response.choices[0].message.content
+            
+            prompt_tokens = response.usage.prompt_tokens if response.usage else int(len(prompt.split()) * 1.3)
+            completion_tokens = response.usage.completion_tokens if response.usage else int(len(answer.split()) * 1.3)
+            total_tokens = response.usage.total_tokens if response.usage else prompt_tokens + completion_tokens
+            
+        except Exception as e:
+            logging.error(f"Error calling real model API for tier {self.tier}: {e}")
+            answer = f"Error generating response: {e}"
+            prompt_tokens = int(len(prompt.split()) * 1.3)
+            completion_tokens = int(len(answer.split()) * 1.3)
+            total_tokens = prompt_tokens + completion_tokens
+            
+        cost = (total_tokens / 1000) * self.config["cost_per_1k"]
+        actual_latency_ms = (time.time() - t0) * 1000
+
+        return {
+            "display_name": f"{self.config['display_name']} (Real)",
+            "answer": answer,
+            "tokens_used": total_tokens,
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "latency_ms": actual_latency_ms,
+            "cost_usd": round(cost, 6)
+        }
+
+
+def get_adapter(tier: str):
+    if tier not in TIER_CONFIG:
+        return None
+
+    tier_upper = tier.upper()
+    model_env = os.getenv(f"{tier_upper}_MODEL")
+    base_url_env = os.getenv(f"{tier_upper}_BASE_URL")
+    api_key_env = os.getenv(f"{tier_upper}_API_KEY", "dummy-key")
+
+    if model_env and OPENAI_AVAILABLE:
+        return RealModelAdapter(tier, model_name=model_env, base_url=base_url_env, api_key=api_key_env)
+        
+    return ModelAdapter(tier)

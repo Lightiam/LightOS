@@ -6,13 +6,17 @@ Schema-compatible for real vLLM/SGLang swap-in.
 Port: 8012
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 import time
 import uuid
 import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from shared.auth import verify_api_key
 
 from model_adapters import get_adapter
 
@@ -88,7 +92,7 @@ async def health():
 
 
 @app.post("/inference/run", response_model=InferenceResponse)
-async def run_inference(req: InferenceRequest):
+async def run_inference(req: InferenceRequest, tenant_id: str = Depends(verify_api_key)):
     tier = req.model_tier.lower()
     adapter = get_adapter(tier)
     if adapter is None:
@@ -101,7 +105,7 @@ async def run_inference(req: InferenceRequest):
     context_text = "\n".join(c.text for c in req.context_chunks) if req.context_chunks else ""
     full_prompt = f"{context_text}\n\nUser: {req.prompt}" if context_text else f"User: {req.prompt}"
 
-    result = adapter.generate(full_prompt, max_tokens=req.max_tokens, temperature=req.temperature)
+    result = await adapter.generate(full_prompt, max_tokens=req.max_tokens, temperature=req.temperature)
 
     return InferenceResponse(
         job_id=job_id,

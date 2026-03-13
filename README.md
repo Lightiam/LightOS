@@ -304,6 +304,34 @@ LightOS/
 
 ---
 
+## 🔌 **Data Center Integration Architecture**
+
+LightOS abstracts the hardware layer, sitting between diverse AI accelerators and the standard AI software stack.
+
+### **1. Driver/Runtime Layer**
+- Acts as a hypervisor for AI compute, sitting below the framework layer.
+- Automatically handles dispatch to the optimal backend (CUDA → ROCm → photonic NPU).
+
+### **2. Framework Layer**
+- **Compatible with PyTorch, TensorFlow, and JAX:** Standard AI model code runs unchanged.
+- **Integration:** Install the runtime (`pip install lightos-runtime`) and existing code routes automatically to the allocated hardware.
+
+### **3. Data Center Infrastructure Layer**
+- **Control Plane API:** Exposes REST/gRPC APIs that integrate natively with data center orchestrators.
+- **Schedulable Resources:** Acts as a device plugin for Kubernetes, SLURM, and custom schedulers so accelerators appear organically in the cluster.
+- **Photonic-Ready:** Provides the essential unified OS configuration layer for next-generation photonic data centers.
+
+### **Integration Paths by Environment**
+| Environment | Integration Path |
+|---|---|
+| **HPC / SLURM clusters** | LightOS SLURM plugin → device scheduling |
+| **Kubernetes / cloud** | LightOS device plugin + container runtime shim |
+| **Bare metal data centers** | LightOS as kernel module + userspace daemon |
+| **Hyperscalers** | Custom silicon backend registration via LightOS HAL |
+| **Photonic data centers** | Native NPU driver + LightOS photonic runtime |
+
+---
+
 ## 🎯 **Use Cases**
 
 ### **1. Local LLM Fine-Tuning**
