@@ -1285,5 +1285,619 @@
         setInterval(updateKPIs, 2000);
         setInterval(updatePowerMetrics, 3000);
     </script>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         ANTIGRAVITY CONTROL PLANE — Injected panels
+         Context Engine · Router API · Inference Proxy · Telemetry API
+         ═══════════════════════════════════════════════════════════════  -->
+    <style>
+        /* ── Antigravity shared styles ─────────────────────────────── */
+        .ag-section { max-width: 1800px; margin: 0 auto; padding: 0 2rem 2rem; }
+        .ag-section-title {
+            font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em;
+            text-transform: uppercase; color: var(--accent);
+            padding: 1.5rem 0 0.75rem;
+            border-top: 1px solid var(--border-color);
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .ag-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .ag-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 1100px) { .ag-grid-2, .ag-grid-3 { grid-template-columns: 1fr; } }
+
+        /* ── Tier badges ────────────────────────────────────────────── */
+        .tier-badge {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.7rem;
+            font-weight: 700; letter-spacing: 0.04em;
+        }
+        .tier-micro  { background: rgba(16,185,129,.15); color: #10B981; border: 1px solid rgba(16,185,129,.3); }
+        .tier-base   { background: rgba(14,165,233,.15); color: #0EA5E9; border: 1px solid rgba(14,165,233,.3); }
+        .tier-max    { background: rgba(139,92,246,.15);  color: #8B5CF6; border: 1px solid rgba(139,92,246,.3); }
+        .tier-unknown{ background: rgba(100,116,139,.15); color: #94A3B8; border: 1px solid rgba(100,116,139,.3); }
+
+        /* ── AI Inference panel ─────────────────────────────────────── */
+        #ag-inference-panel textarea {
+            width: 100%; min-height: 90px; resize: vertical;
+            background: var(--bg-tertiary); border: 1px solid var(--border-light);
+            border-radius: 8px; color: var(--text-primary); font-size: 0.875rem;
+            padding: 0.75rem; font-family: inherit; outline: none;
+            transition: border-color 0.2s;
+        }
+        #ag-inference-panel textarea:focus { border-color: var(--primary); }
+        .ag-controls { display: flex; gap: 0.75rem; align-items: center; margin-top: 0.75rem; flex-wrap: wrap; }
+        .ag-select {
+            background: var(--bg-tertiary); border: 1px solid var(--border-light);
+            color: var(--text-primary); padding: 0.45rem 0.75rem;
+            border-radius: 8px; font-size: 0.8rem; outline: none; cursor: pointer;
+        }
+        .ag-btn {
+            padding: 0.5rem 1.25rem; border-radius: 8px; border: none;
+            font-weight: 600; font-size: 0.85rem; cursor: pointer;
+            transition: all 0.2s; display: flex; align-items: center; gap: 0.4rem;
+        }
+        .ag-btn-primary { background: var(--gradient-primary); color: #fff; }
+        .ag-btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+        .ag-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .ag-btn-secondary { background: var(--bg-elevated); color: var(--text-secondary); border: 1px solid var(--border-color); }
+        .ag-answer-box {
+            margin-top: 1rem; background: var(--bg-tertiary); border-radius: 8px;
+            padding: 1rem; font-size: 0.85rem; line-height: 1.7;
+            color: var(--text-primary); border-left: 3px solid var(--primary);
+            min-height: 60px;
+        }
+        .ag-answer-meta {
+            display: flex; gap: 1rem; flex-wrap: wrap;
+            margin-top: 0.75rem; padding-top: 0.75rem;
+            border-top: 1px solid var(--border-color);
+        }
+        .ag-meta-pill {
+            font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 12px;
+            background: var(--bg-elevated); color: var(--text-secondary);
+        }
+        .ag-meta-pill span { color: var(--primary); font-weight: 600; }
+
+        /* ── Request Path diagram ───────────────────────────────────── */
+        .rp-steps { display: flex; align-items: stretch; gap: 0; margin-top: 1rem; overflow-x: auto; }
+        .rp-step {
+            flex: 1; min-width: 130px; background: var(--bg-tertiary);
+            border: 1px solid var(--border-color); border-radius: 0;
+            padding: 1rem 0.75rem; position: relative; text-align: center;
+            transition: border-color 0.3s;
+        }
+        .rp-step:first-child { border-radius: 8px 0 0 8px; }
+        .rp-step:last-child  { border-radius: 0 8px 8px 0; }
+        .rp-step.active { border-color: var(--primary); background: rgba(14,165,233,.06); }
+        .rp-step.done   { border-color: var(--success);  background: rgba(16,185,129,.06); }
+        .rp-step::after {
+            content: '▶'; position: absolute; right: -10px; top: 50%;
+            transform: translateY(-50%); color: var(--border-light);
+            font-size: 1rem; z-index: 2; background: var(--bg-primary); padding: 2px 0;
+        }
+        .rp-step:last-child::after { display: none; }
+        .rp-icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
+        .rp-label { font-size: 0.7rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; }
+        .rp-value { font-size: 0.75rem; color: var(--primary); margin-top: 0.3rem; font-weight: 600; word-break: break-word; }
+        .rp-hit  { font-size: 0.65rem; color: var(--success); margin-top: 0.2rem; }
+        .rp-miss { font-size: 0.65rem; color: var(--text-muted); margin-top: 0.2rem; }
+
+        /* ── Workload table ─────────────────────────────────────────── */
+        .ag-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        .ag-table th {
+            padding: 0.6rem 0.75rem; text-align: left; font-size: 0.7rem;
+            font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+            color: var(--text-muted); border-bottom: 1px solid var(--border-color);
+        }
+        .ag-table td { padding: 0.6rem 0.75rem; border-bottom: 1px solid rgba(30,58,95,.5); }
+        .ag-table tr:hover td { background: rgba(14,165,233,.04); }
+        .ag-table .mono { font-family: 'Courier New', monospace; font-size: 0.72rem; color: var(--text-secondary); }
+        .cache-hit   { color: var(--success); font-weight: 600; }
+        .cache-miss  { color: var(--text-muted); }
+
+        /* ── Policy Editor ──────────────────────────────────────────── */
+        #ag-policy-editor textarea {
+            width: 100%; min-height: 240px; resize: vertical; font-family: 'Courier New', monospace;
+            font-size: 0.78rem; line-height: 1.6;
+            background: #080f1d; border: 1px solid var(--border-light);
+            border-radius: 8px; color: #7dd3fc; padding: 1rem; outline: none;
+            transition: border-color 0.2s;
+        }
+        #ag-policy-editor textarea:focus { border-color: var(--accent); }
+        .ag-save-hint { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.5rem; }
+        .ag-save-result { margin-top: 0.5rem; font-size: 0.8rem; min-height: 1.2em; }
+
+        /* ── Telemetry summary pills ────────────────────────────────── */
+        .ag-summary-pills { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; }
+        .ag-sum-pill {
+            background: var(--bg-tertiary); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 0.6rem 1rem; min-width: 120px;
+        }
+        .ag-sum-pill-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+        .ag-sum-pill-value { font-size: 1.2rem; font-weight: 700; color: var(--primary); margin-top: 0.2rem; }
+
+        /* ── Spinner ────────────────────────────────────────────────── */
+        .ag-spinner {
+            display: inline-block; width: 14px; height: 14px;
+            border: 2px solid rgba(255,255,255,.2); border-top-color: #fff;
+            border-radius: 50%; animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+
+    <div class="ag-section">
+        <!-- ── Section header ──────────────────────────────────────── -->
+        <div class="ag-section-title">⚡ Antigravity Control Plane — Context · Routing · Inference · Telemetry</div>
+
+        <!-- ── Row 1: AI Inference + Request Path ──────────────────── -->
+        <div class="ag-grid-2" style="margin-bottom:1.5rem;">
+
+            <!-- AI Inference Console -->
+            <div class="card" id="ag-inference-panel">
+                <div class="card-header">
+                    <span class="card-title">🤖 AI Inference Console</span>
+                    <span id="ag-conn-status" style="font-size:0.7rem;color:var(--text-muted);">Connecting…</span>
+                </div>
+                <textarea id="ag-prompt-input" placeholder="Ask LightOS anything… e.g. 'Explain photonic scheduling' or 'What is MFU?'"></textarea>
+                <div class="ag-controls">
+                    <select class="ag-select" id="ag-user-tier">
+                        <option value="standard">Standard User</option>
+                        <option value="premium">Premium User</option>
+                        <option value="free">Free Tier</option>
+                    </select>
+                    <select class="ag-select" id="ag-slo-ms">
+                        <option value="500">SLO: 500ms</option>
+                        <option value="200">SLO: 200ms (fast)</option>
+                        <option value="1000">SLO: 1s (relaxed)</option>
+                    </select>
+                    <button class="ag-btn ag-btn-primary" id="ag-submit-btn" onclick="agRunInference()">
+                        <span id="ag-submit-icon">▶</span> <span id="ag-submit-txt">Submit</span>
+                    </button>
+                </div>
+                <div class="ag-answer-box" id="ag-answer-box" style="display:none;"></div>
+                <div class="ag-answer-meta" id="ag-answer-meta" style="display:none;"></div>
+            </div>
+
+            <!-- Request Path -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">🗺️ Request Path</span>
+                    <span style="font-size:0.7rem;color:var(--text-muted);" id="rp-job-id">—</span>
+                </div>
+                <div class="rp-steps" id="rp-steps">
+                    <div class="rp-step" id="rps-0">
+                        <div class="rp-icon">📝</div>
+                        <div class="rp-label">Prompt</div>
+                        <div class="rp-value" id="rp-tokens">—</div>
+                    </div>
+                    <div class="rp-step" id="rps-1">
+                        <div class="rp-icon">🔍</div>
+                        <div class="rp-label">Context</div>
+                        <div class="rp-value" id="rp-chunks">—</div>
+                        <div class="rp-miss" id="rp-cache-status">—</div>
+                    </div>
+                    <div class="rp-step" id="rps-2">
+                        <div class="rp-icon">🧭</div>
+                        <div class="rp-label">Router</div>
+                        <div class="rp-value" id="rp-tier">—</div>
+                        <div class="rp-miss" id="rp-rule">—</div>
+                    </div>
+                    <div class="rp-step" id="rps-3">
+                        <div class="rp-icon">⚡</div>
+                        <div class="rp-label">Model</div>
+                        <div class="rp-value" id="rp-latency">—</div>
+                        <div class="rp-miss" id="rp-cost">—</div>
+                    </div>
+                    <div class="rp-step" id="rps-4">
+                        <div class="rp-icon">✅</div>
+                        <div class="rp-label">Answer</div>
+                        <div class="rp-value" id="rp-completion">—</div>
+                    </div>
+                </div>
+                <!-- Mini tier breakdown -->
+                <div style="margin-top:1rem;">
+                    <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:0.5rem;">MODEL TIER BREAKDOWN (session)</div>
+                    <div id="rp-tier-breakdown" style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                        <div class="tier-badge tier-micro">LightMicro: <span id="cnt-micro">0</span></div>
+                        <div class="tier-badge tier-base">LightBase: <span id="cnt-base">0</span></div>
+                        <div class="tier-badge tier-max">LightMax: <span id="cnt-max">0</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Row 2: Workload Telemetry + Policy Editor ─────────── -->
+        <div class="ag-grid-2">
+
+            <!-- Workload Telemetry -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📊 Workload Telemetry</span>
+                    <button class="ag-btn ag-btn-secondary" style="font-size:0.72rem;padding:0.3rem 0.8rem;" onclick="agLoadTelemetry()">↻ Refresh</button>
+                </div>
+                <!-- Summary pills -->
+                <div class="ag-summary-pills" id="ag-summary-pills">
+                    <div class="ag-sum-pill"><div class="ag-sum-pill-label">Total Jobs</div><div class="ag-sum-pill-value" id="sum-jobs">—</div></div>
+                    <div class="ag-sum-pill"><div class="ag-sum-pill-label">Total Tokens</div><div class="ag-sum-pill-value" id="sum-tokens">—</div></div>
+                    <div class="ag-sum-pill"><div class="ag-sum-pill-label">Cache Hit Rate</div><div class="ag-sum-pill-value" id="sum-cache">—</div></div>
+                    <div class="ag-sum-pill"><div class="ag-sum-pill-label">Avg Latency</div><div class="ag-sum-pill-value" id="sum-latency">—</div></div>
+                    <div class="ag-sum-pill"><div class="ag-sum-pill-label">Total Cost</div><div class="ag-sum-pill-value" id="sum-cost">—</div></div>
+                </div>
+                <!-- Jobs table -->
+                <div style="overflow-x:auto;max-height:320px;overflow-y:auto;">
+                    <table class="ag-table">
+                        <thead>
+                            <tr>
+                                <th>Job ID</th>
+                                <th>Tier</th>
+                                <th>Tokens</th>
+                                <th>Latency</th>
+                                <th>Cache</th>
+                                <th>Domain</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ag-jobs-tbody">
+                            <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:2rem;">
+                                Loading telemetry… (start docker-compose up)
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Policy Editor -->
+            <div class="card" id="ag-policy-editor">
+                <div class="card-header">
+                    <span class="card-title">⚙️ Routing Policy Editor</span>
+                    <button class="ag-btn ag-btn-secondary" style="font-size:0.72rem;padding:0.3rem 0.8rem;" onclick="agLoadPolicy()">↻ Load</button>
+                </div>
+                <div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:0.75rem;">
+                    Edit routing rules (YAML). Changes apply immediately to all new requests.
+                    <br>Format: <code style="color:var(--primary);">- name: rule_name</code> → <code style="color:var(--primary);">condition:</code> → <code style="color:var(--primary);">result:</code>
+                </div>
+                <textarea id="ag-policy-textarea" spellcheck="false" placeholder="Loading policy from Router API…"></textarea>
+                <div class="ag-controls">
+                    <button class="ag-btn ag-btn-primary" onclick="agSavePolicy()">💾 Save Policy</button>
+                    <button class="ag-btn ag-btn-secondary" onclick="agLoadPolicy()">↺ Reset</button>
+                </div>
+                <div class="ag-save-result" id="ag-save-result"></div>
+                <div class="ag-save-hint">Routing rules are persisted to <code>router/config.yaml</code> and hot-reloaded with no restart required.</div>
+                <!-- Tier definitions (read-only) -->
+                <div style="margin-top:1rem;">
+                    <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:.04em;">Active Model Tiers</div>
+                    <div id="ag-tier-defs" style="display:flex;flex-direction:column;gap:0.4rem;font-size:0.75rem;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ══════════════════════════════════════════════════════════════════
+    //  Antigravity Control Plane — API Client
+    // ══════════════════════════════════════════════════════════════════
+    const AG = {
+        contextEngine:   localStorage.getItem('AG_CONTEXT_URL')   || 'http://localhost:8010',
+        router:          localStorage.getItem('AG_ROUTER_URL')     || 'http://localhost:8011',
+        inferenceProxy:  localStorage.getItem('AG_INFERENCE_URL')  || 'http://localhost:8012',
+        telemetry:       localStorage.getItem('AG_TELEMETRY_URL')  || 'http://localhost:8013',
+    };
+
+    // Session tier counters
+    const SESSION_COUNTS = { lightmicro: 0, lightbase: 0, lightmax: 0 };
+
+    // ── Connection status check ───────────────────────────────────────
+    async function agCheckConnections() {
+        const el = document.getElementById('ag-conn-status');
+        try {
+            const r = await fetch(`${AG.router}/router/health`, { signal: AbortSignal.timeout(2000) });
+            if (r.ok) {
+                el.textContent = '● Services Online';
+                el.style.color = 'var(--success)';
+                agLoadTelemetry();
+                agLoadPolicy();
+                return;
+            }
+        } catch {}
+        el.textContent = '○ Backend Offline (docker-compose up)';
+        el.style.color = 'var(--warning)';
+        agInjectDemoTelemetry();
+    }
+
+    // ── Full inference pipeline ───────────────────────────────────────
+    async function agRunInference() {
+        const prompt = document.getElementById('ag-prompt-input').value.trim();
+        if (!prompt) return;
+
+        const btn = document.getElementById('ag-submit-btn');
+        const icon = document.getElementById('ag-submit-icon');
+        const txt  = document.getElementById('ag-submit-txt');
+        btn.disabled = true;
+        icon.innerHTML = '<span class="ag-spinner"></span>';
+        txt.textContent = 'Running…';
+
+        agResetRequestPath();
+
+        try {
+            const tier = document.getElementById('ag-user-tier').value;
+            const slo  = parseInt(document.getElementById('ag-slo-ms').value);
+
+            // Step 1: Context retrieval
+            agSetRPStep(1, 'active');
+            const ctxRes = await agFetch(`${AG.contextEngine}/context/retrieve`, 'POST', {
+                prompt, user_id: 'aurora-ui', app_id: 'lightos-aurora',
+                max_tokens: 4096, top_k: 5
+            });
+            agSetRPStep(1, 'done');
+            document.getElementById('rp-tokens').textContent = `${prompt.split(' ').length} words`;
+            document.getElementById('rp-chunks').textContent = `${ctxRes.chunks?.length ?? 0} chunks`;
+            const cacheHit = ctxRes.cache_hit;
+            const cacheEl = document.getElementById('rp-cache-status');
+            cacheEl.textContent = cacheHit ? `✓ ${ctxRes.cache_type} cache` : '○ cache miss';
+            cacheEl.className   = cacheHit ? 'rp-hit' : 'rp-miss';
+
+            // Step 2: Routing decision
+            agSetRPStep(2, 'active');
+            const routeRes = await agFetch(`${AG.router}/router/route`, 'POST', {
+                prompt_length: prompt.length,
+                context_tokens: ctxRes.total_tokens_estimated || 0,
+                user_tier: tier, latency_slo_ms: slo, app_id: 'lightos-aurora'
+            });
+            agSetRPStep(2, 'done');
+            const tierId = routeRes.model_tier;
+            document.getElementById('rp-tier').innerHTML = `<span class="tier-badge ${tierBadgeClass(tierId)}">${routeRes.model_display_name}</span>`;
+            document.getElementById('rp-rule').textContent = `Rule: ${routeRes.matched_rule}`;
+
+            // Step 3: Inference
+            agSetRPStep(3, 'active');
+            const infRes = await agFetch(`${AG.inferenceProxy}/inference/run`, 'POST', {
+                model_tier: tierId,
+                prompt,
+                context_chunks: ctxRes.chunks || [],
+                cache_key: ctxRes.cache_key || '',
+                user_id: 'aurora-ui',
+                max_tokens: 512,
+                temperature: 0.7
+            });
+            agSetRPStep(3, 'done');
+            document.getElementById('rp-latency').textContent = `${infRes.latency_ms?.toFixed(0)} ms`;
+            document.getElementById('rp-cost').textContent    = `$${infRes.cost_usd?.toFixed(5)}`;
+
+            // Step 4: Complete
+            agSetRPStep(4, 'done');
+            document.getElementById('rp-completion').textContent = `${infRes.completion_tokens} tokens`;
+            document.getElementById('rp-job-id').textContent = `Job: ${infRes.job_id}`;
+
+            // Show answer
+            const answerBox  = document.getElementById('ag-answer-box');
+            const answerMeta = document.getElementById('ag-answer-meta');
+            answerBox.style.display  = 'block';
+            answerMeta.style.display = 'flex';
+            answerBox.textContent    = infRes.answer;
+            answerMeta.innerHTML = `
+                <span class="ag-meta-pill">Model: <span>${infRes.model_display_name}</span></span>
+                <span class="ag-meta-pill">Tokens: <span>${infRes.tokens_used}</span></span>
+                <span class="ag-meta-pill">Latency: <span>${infRes.latency_ms?.toFixed(0)}ms</span></span>
+                <span class="ag-meta-pill">Cost: <span>$${infRes.cost_usd?.toFixed(5)}</span></span>
+                <span class="ag-meta-pill">Cache: <span>${cacheHit ? '✓ HIT' : 'MISS'}</span></span>
+                <span class="ag-meta-pill">Domain: <span>${routeRes.topology_domain}</span></span>
+            `;
+
+            // Update session counts
+            SESSION_COUNTS[tierId] = (SESSION_COUNTS[tierId] || 0) + 1;
+            agUpdateTierCounts();
+
+            // Post telemetry
+            agFetch(`${AG.telemetry}/telemetry/event`, 'POST', {
+                job_id: infRes.job_id,
+                model_tier: tierId,
+                tokens_used: infRes.tokens_used,
+                prompt_tokens: infRes.prompt_tokens,
+                completion_tokens: infRes.completion_tokens,
+                latency_ms: infRes.latency_ms,
+                cache_hit: ctxRes.cache_hit,
+                cache_type: ctxRes.cache_type,
+                topology_domain: routeRes.topology_domain,
+                user_id: 'aurora-ui',
+                app_id: 'lightos-aurora',
+                matched_rule: routeRes.matched_rule,
+                cost_usd: infRes.cost_usd,
+                context_chunks_used: infRes.context_chunks_used
+            }).catch(() => {});
+
+        } catch (e) {
+            document.getElementById('ag-answer-box').style.display = 'block';
+            document.getElementById('ag-answer-box').textContent =
+                `⚠ Backend not reachable. Start services with:\n  cd lightos-core && docker-compose up --build\n\nError: ${e.message}`;
+            document.getElementById('ag-answer-box').style.borderLeftColor = 'var(--warning)';
+        }
+
+        btn.disabled = false;
+        icon.textContent = '▶';
+        txt.textContent  = 'Submit';
+    }
+
+    // ── Telemetry loader ──────────────────────────────────────────────
+    async function agLoadTelemetry() {
+        try {
+            const [sumRes, jobsRes] = await Promise.all([
+                agFetch(`${AG.telemetry}/telemetry/summary`),
+                agFetch(`${AG.telemetry}/telemetry/jobs?limit=30`)
+            ]);
+            agRenderSummary(sumRes);
+            agRenderJobs(jobsRes.jobs || []);
+        } catch {
+            // Silently fail if offline
+        }
+    }
+
+    function agRenderSummary(s) {
+        const t = s.totals || {};
+        document.getElementById('sum-jobs').textContent    = t.total_jobs?.toLocaleString() ?? '—';
+        document.getElementById('sum-tokens').textContent  = t.total_tokens ? agFmt(t.total_tokens) : '—';
+        document.getElementById('sum-cache').textContent   = t.cache_hit_rate_pct ? `${t.cache_hit_rate_pct.toFixed(1)}%` : '—';
+        document.getElementById('sum-latency').textContent = t.avg_latency_ms ? `${t.avg_latency_ms.toFixed(0)}ms` : '—';
+        document.getElementById('sum-cost').textContent    = t.total_cost_usd ? `$${t.total_cost_usd.toFixed(3)}` : '—';
+    }
+
+    function agRenderJobs(jobs) {
+        const tbody = document.getElementById('ag-jobs-tbody');
+        if (!jobs.length) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:1.5rem;">No jobs yet — submit a prompt above!</td></tr>';
+            return;
+        }
+        tbody.innerHTML = jobs.map(j => `
+            <tr>
+                <td class="mono">${j.job_id}</td>
+                <td><span class="tier-badge ${tierBadgeClass(j.model_tier)}">${tierLabel(j.model_tier)}</span></td>
+                <td>${(j.tokens_used||0).toLocaleString()}</td>
+                <td>${j.latency_ms?.toFixed(0)}ms</td>
+                <td class="${j.cache_hit ? 'cache-hit' : 'cache-miss'}">${j.cache_hit ? `✓ ${j.cache_type||'hit'}` : '—'}</td>
+                <td style="font-size:0.7rem;color:var(--text-muted);">${j.topology_domain||'—'}</td>
+                <td class="mono">${(j.created_at||'').slice(-8)}</td>
+            </tr>
+        `).join('');
+    }
+
+    function agInjectDemoTelemetry() {
+        // Show static demo data when backend is offline
+        const demoJobs = [
+            { job_id:'demo-a1b2c3', model_tier:'lightbase', tokens_used:623, latency_ms:168, cache_hit:false, topology_domain:'dc-1-rack-a', created_at:'2026-03-12 22:00:01' },
+            { job_id:'demo-d4e5f6', model_tier:'lightmicro', tokens_used:145, latency_ms:47, cache_hit:true, cache_type:'exact', topology_domain:'dc-1-rack-a', created_at:'2026-03-12 22:01:15' },
+            { job_id:'demo-g7h8i9', model_tier:'lightmax', tokens_used:1840, latency_ms:582, cache_hit:false, topology_domain:'dc-1-rack-b', created_at:'2026-03-12 22:02:44' },
+            { job_id:'demo-j1k2l3', model_tier:'lightbase', tokens_used:710, latency_ms:193, cache_hit:true, cache_type:'semantic', topology_domain:'dc-1-rack-a', created_at:'2026-03-12 22:03:55' },
+        ];
+        document.getElementById('sum-jobs').textContent    = '250 (demo)';
+        document.getElementById('sum-tokens').textContent  = '142K';
+        document.getElementById('sum-cache').textContent   = '38.4%';
+        document.getElementById('sum-latency').textContent = '198ms';
+        document.getElementById('sum-cost').textContent    = '$0.183';
+        agRenderJobs(demoJobs);
+    }
+
+    // ── Policy loader / saver ─────────────────────────────────────────
+    async function agLoadPolicy() {
+        try {
+            const pol = await agFetch(`${AG.router}/router/policy`);
+            const rules = pol.routing_rules || [];
+            const yaml = rules.map(r => [
+                `- name: ${r.name}`,
+                `  description: ${r.description || ''}`,
+                `  condition:`,
+                ...Object.entries(r.condition||{}).map(([k,v]) => `    ${k}: ${v}`),
+                `  result:`,
+                ...Object.entries(r.result||{}).map(([k,v]) => `    ${k}: ${v}`)
+            ].join('\n')).join('\n\n');
+
+            document.getElementById('ag-policy-textarea').value = yaml ||
+                '# No rules loaded. Start router service (port 8011).';
+
+            // Render tier definitions
+            const tiers = pol.model_tiers || {};
+            document.getElementById('ag-tier-defs').innerHTML = Object.values(tiers).map(t => `
+                <div style="display:flex;align-items:center;gap:0.5rem;">
+                    <span class="tier-badge ${tierBadgeClass(t.id)}">${t.display_name}</span>
+                    <span style="color:var(--text-muted);">${t.param_size} · ~${t.avg_latency_ms}ms · $${t.cost_per_1k_tokens}/1k</span>
+                </div>
+            `).join('');
+        } catch {
+            document.getElementById('ag-policy-textarea').value =
+                '# Router not reachable.\n# Start services: cd lightos-core && docker-compose up --build\n\n- name: ultra_fast_slo\n  condition:\n    latency_slo_ms_lt: 100\n  result:\n    model_tier: lightmicro\n    context_budget: 1024';
+            document.getElementById('ag-tier-defs').innerHTML = [
+                ['lightmicro','LightMicro','1-3B','~45ms'],
+                ['lightbase','LightBase','13-30B','~175ms'],
+                ['lightmax','LightMax','70B+','~580ms'],
+            ].map(([id,name,params,lat]) => `
+                <div style="display:flex;align-items:center;gap:0.5rem;">
+                    <span class="tier-badge ${tierBadgeClass(id)}">${name}</span>
+                    <span style="color:var(--text-muted);">${params} · ${lat}</span>
+                </div>
+            `).join('');
+        }
+    }
+
+    async function agSavePolicy() {
+        const yml = document.getElementById('ag-policy-textarea').value;
+        const res = document.getElementById('ag-save-result');
+        res.textContent = 'Saving…';
+        res.style.color = 'var(--text-muted)';
+        try {
+            await agFetch(`${AG.router}/config/update`, 'POST', { rules_yaml: yml });
+            res.textContent = '✓ Policy saved and hot-reloaded.';
+            res.style.color = 'var(--success)';
+        } catch (e) {
+            res.textContent = `✗ Save failed: ${e.message}`;
+            res.style.color = 'var(--danger)';
+        }
+        setTimeout(() => { res.textContent = ''; }, 4000);
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────
+    async function agFetch(url, method = 'GET', body = null) {
+        const opts = {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            signal: AbortSignal.timeout(8000)
+        };
+        if (body) opts.body = JSON.stringify(body);
+        const r = await fetch(url, opts);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+    }
+
+    function tierBadgeClass(tier) {
+        if (!tier) return 'tier-unknown';
+        if (tier.includes('micro')) return 'tier-micro';
+        if (tier.includes('max'))   return 'tier-max';
+        if (tier.includes('base'))  return 'tier-base';
+        return 'tier-unknown';
+    }
+
+    function tierLabel(tier) {
+        const map = { lightmicro:'LightMicro', lightbase:'LightBase', lightmax:'LightMax' };
+        return map[tier] || tier;
+    }
+
+    function agFmt(n) {
+        if (n >= 1e9) return (n/1e9).toFixed(1)+'B';
+        if (n >= 1e6) return (n/1e6).toFixed(1)+'M';
+        if (n >= 1e3) return (n/1e3).toFixed(1)+'K';
+        return n.toString();
+    }
+
+    function agResetRequestPath() {
+        [0,1,2,3,4].forEach(i => document.getElementById(`rps-${i}`).className = 'rp-step');
+        agSetRPStep(0, 'done');
+        ['rp-tokens','rp-chunks','rp-cache-status','rp-tier','rp-rule',
+         'rp-latency','rp-cost','rp-completion'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = '…';
+        });
+        document.getElementById('rp-job-id').textContent = 'Running…';
+    }
+
+    function agSetRPStep(idx, state) {
+        const el = document.getElementById(`rps-${idx}`);
+        if (el) el.className = `rp-step ${state}`;
+    }
+
+    function agUpdateTierCounts() {
+        document.getElementById('cnt-micro').textContent = SESSION_COUNTS.lightmicro;
+        document.getElementById('cnt-base').textContent  = SESSION_COUNTS.lightbase;
+        document.getElementById('cnt-max').textContent   = SESSION_COUNTS.lightmax;
+    }
+
+    // ── Init ──────────────────────────────────────────────────────────
+    window.addEventListener('DOMContentLoaded', () => {
+        agCheckConnections();
+        // Refresh telemetry every 30s
+        setInterval(agLoadTelemetry, 30000);
+    });
+
+    // Allow Enter (Ctrl+Enter) to submit
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('ag-prompt-input').addEventListener('keydown', e => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') agRunInference();
+        });
+    });
+    </script>
 </body>
 </html>

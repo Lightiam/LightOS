@@ -1,0 +1,110 @@
+version: '3.9'
+
+# LightOS Core — One-click dev stack
+# Services: Context Engine, Router, Inference Proxy, Telemetry, DCIM API
+# Run: docker-compose up --build
+# Seed data: docker-compose run seed
+
+volumes:
+  telemetry_data:
+
+networks:
+  lightos-net:
+    driver: bridge
+
+services:
+
+  # ── Context Engine ──────────────────────────────────────────
+  context-engine:
+    build: ./context-engine
+    container_name: lightos-context-engine
+    ports:
+      - "8010:8010"
+    networks:
+      - lightos-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8010/context/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # ── Router API ──────────────────────────────────────────────
+  router:
+    build: ./router
+    container_name: lightos-router
+    ports:
+      - "8011:8011"
+    networks:
+      - lightos-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8011/router/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # ── Inference Proxy ─────────────────────────────────────────
+  inference-proxy:
+    build: ./inference-proxy
+    container_name: lightos-inference-proxy
+    ports:
+      - "8012:8012"
+    networks:
+      - lightos-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8012/inference/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # ── Telemetry API ───────────────────────────────────────────
+  telemetry:
+    build: ./telemetry
+    container_name: lightos-telemetry
+    ports:
+      - "8013:8013"
+    volumes:
+      - telemetry_data:/data
+    environment:
+      - DATA_DIR=/data
+    networks:
+      - lightos-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8013/telemetry/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # ── Seed (one-shot) ─────────────────────────────────────────
+  seed:
+    build: ./telemetry
+    container_name: lightos-seed
+    command: python seed.py
+    volumes:
+      - telemetry_data:/data
+    environment:
+      - DATA_DIR=/data
+    networks:
+      - lightos-net
+    depends_on:
+      - telemetry
+    profiles:
+      - seed
+
+  # ── DCIM API (existing) ─────────────────────────────────────
+  dcim-api:
+    build: ../dcim-api
+    container_name: lightos-dcim-api
+    ports:
+      - "8001:8001"
+    networks:
+      - lightos-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3

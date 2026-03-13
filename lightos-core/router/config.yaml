@@ -1,0 +1,106 @@
+# LightOS Router — Global Configuration
+# Routing rules are evaluated top-to-bottom; first match wins.
+# Model tiers: LightMicro (tiny), LightBase (small), LightMax (large)
+
+model_tiers:
+  lightmicro:
+    id: "lightmicro"
+    display_name: "LightMicro"
+    param_size: "1-3B"
+    max_context_tokens: 2048
+    avg_latency_ms: 45
+    cost_per_1k_tokens: 0.0002
+    description: "Ultra-fast router/classifier model for simple tasks"
+
+  lightbase:
+    id: "lightbase"
+    display_name: "LightBase"
+    param_size: "13-30B"
+    max_context_tokens: 8192
+    avg_latency_ms: 180
+    cost_per_1k_tokens: 0.001
+    description: "Standard inference for most workloads"
+
+  lightmax:
+    id: "lightmax"
+    display_name: "LightMax"
+    param_size: "70B+"
+    max_context_tokens: 32768
+    avg_latency_ms: 600
+    cost_per_1k_tokens: 0.005
+    description: "Complex reasoning, photonic-backed at scale"
+
+routing_rules:
+  - name: "ultra_fast_slo"
+    description: "Sub-100ms SLO with short context → LightMicro"
+    condition:
+      latency_slo_ms_lt: 100
+      context_tokens_lt: 1024
+    result:
+      model_tier: "lightmicro"
+      context_budget: 1024
+      cache_strategy: "aggressive"
+
+  - name: "premium_user_large"
+    description: "Premium users with long context → LightMax"
+    condition:
+      user_tier_eq: "premium"
+      context_tokens_gte: 4096
+    result:
+      model_tier: "lightmax"
+      context_budget: 16384
+      cache_strategy: "semantic"
+
+  - name: "premium_user_standard"
+    description: "Premium users standard tasks → LightBase"
+    condition:
+      user_tier_eq: "premium"
+    result:
+      model_tier: "lightbase"
+      context_budget: 8192
+      cache_strategy: "semantic"
+
+  - name: "fast_slo_medium_context"
+    description: "Fast SLO with medium context → LightBase"
+    condition:
+      latency_slo_ms_lt: 300
+      context_tokens_lt: 4096
+    result:
+      model_tier: "lightbase"
+      context_budget: 4096
+      cache_strategy: "exact"
+
+  - name: "complex_long_context"
+    description: "Long context or complex task → LightMax"
+    condition:
+      context_tokens_gte: 8000
+    result:
+      model_tier: "lightmax"
+      context_budget: 16384
+      cache_strategy: "semantic"
+
+default:
+  model_tier: "lightbase"
+  context_budget: 4096
+  cache_strategy: "exact"
+
+# Topology domains — used for routing telemetry
+topology:
+  domains:
+    - id: "dc-1-rack-a"
+      label: "DC1 Rack A — Photonic Fabric Zone"
+      bandwidth_gbps: 3200
+    - id: "dc-1-rack-b"
+      label: "DC1 Rack B — Electrical NVLink"
+      bandwidth_gbps: 900
+    - id: "dc-2-edge"
+      label: "DC2 Edge Cluster"
+      bandwidth_gbps: 400
+
+context_budgets:
+  hard_cap_tokens: 32768
+  default_tokens: 4096
+  priority_tiers:
+    premium: 16384
+    standard: 4096
+    free: 1024

@@ -24,11 +24,44 @@
   to = "/api/:splat"
   status = 200
 
-# DCIM API Proxy (Update this URL with your deployed API)
-# To deploy the API, see: dcim-api/DEPLOY_API.md
+# DCIM API Proxy (existing)
 [[redirects]]
   from = "/api/dcim/*"
   to = "http://localhost:8001/api/dcim/:splat"
+  status = 200
+  force = false
+
+# Antigravity — Context Engine (port 8010)
+[[redirects]]
+  from = "/api/context/*"
+  to = "http://localhost:8010/context/:splat"
+  status = 200
+  force = false
+
+# Antigravity — Router API (port 8011)
+[[redirects]]
+  from = "/api/router/*"
+  to = "http://localhost:8011/router/:splat"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/api/config/*"
+  to = "http://localhost:8011/config/:splat"
+  status = 200
+  force = false
+
+# Antigravity — Inference Proxy (port 8012)
+[[redirects]]
+  from = "/api/inference/*"
+  to = "http://localhost:8012/inference/:splat"
+  status = 200
+  force = false
+
+# Antigravity — Telemetry API (port 8013)
+[[redirects]]
+  from = "/api/telemetry/*"
+  to = "http://localhost:8013/telemetry/:splat"
   status = 200
   force = false
 
