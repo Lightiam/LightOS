@@ -1,0 +1,43 @@
+// Embedded mock data - no API needed
+window.LIGHTOS_MOCK_DATA = {
+  clusters: [
+    {
+      id: 1,
+      name: "Production Cluster",
+      region: "us-west-2",
+      gpu_type: "H100",
+      gpu_count: 8,
+      status: "running",
+      created_at: "2024-01-15T10:30:00Z",
+      utilization: 78.5
+    },
+    {
+      id: 2,
+      name: "Development Cluster",
+      region: "us-east-1",
+      gpu_type: "A100",
+      gpu_count: 4,
+      status: "running",
+      created_at: "2024-02-01T14:20:00Z",
+      utilization: 45.2
+    },
+    {
+      id: 3,
+      name: "Training Cluster",
+      region: "eu-west-1",
+      gpu_type: "H100",
+      gpu_count: 16,
+      status: "running",
+      created_at: "2024-03-01T09:15:00Z",
+      utilization: 92.1
+    }
+  ]
+};
+
+// Mock API fetch function
+window.mockFetch = async (url) => {
+  if (url.includes('/clusters')) {
+    return { clusters: window.LIGHTOS_MOCK_DATA.clusters, total: 3 };
+  }
+  return {};
+};
